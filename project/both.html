@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atta side by side</title>
+  <style>
+    * { box-sizing: border-box }
+    body { margin: 0; min-height: 100vh; background: #e2e8f0; color: #0f172a; font: 14px/1.5 system-ui, sans-serif }
+    header { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 16px; padding: 12px 16px; text-align: center }
+    header a { color: #1d3f8f; font-weight: 600 }
+    .stage { display: flex; flex-wrap: wrap; justify-content: center; gap: 24px; padding: 0 16px 24px }
+    figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px }
+    figcaption { font-weight: 600 }
+    .phone { width: 390px; height: 844px; max-width: calc(100vw - 32px); border-radius: 28px; overflow: hidden; background: #fff; box-shadow: 0 16px 40px rgb(15 23 42 / 18%) }
+    iframe { width: 390px; height: 844px; border: 0; display: block }
+  </style>
+</head>
+<body>
+  <header>
+    <span>Citizen code <b>123456</b> · Officer login <b>OF-1024 / 1234</b></span>
+    <a href="./index.html">Back to start</a>
+  </header>
+  <div class="stage">
+    <figure><figcaption>Citizen app</figcaption><div class="phone"><iframe src="./Main.dc.html" title="Citizen app"></iframe></div></figure>
+    <figure><figcaption>Officer app</figcaption><div class="phone"><iframe src="./Officer.dc.html" title="Officer app"></iframe></div></figure>
+  </div>
+</body>
+</html>

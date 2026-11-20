@@ -2,7 +2,10 @@
 <html lang="km">
 <head>
 <meta charset="utf-8">
-<title>Officer app – review and verify applications</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atta – officer app</title>
+<script src="./vendor/qrcode.min.js"></script>
+<script src="./shared.js"></script>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -13,14 +16,14 @@
 <link rel="stylesheet" href="./Officer.dc.css">
 </helmet>
 <div class="app">
-  <header class="top">
+  <header class="{{topCls}}">
     <sc-if value="{{showBack}}" hint-placeholder-val="{{ false }}">
       <button class="icon-btn" aria-label="{{t.back}}" onClick="{{goBack}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
     </sc-if>
     <sc-if value="{{showLogo}}" hint-placeholder-val="{{ true }}">
-      <div class="logo" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path><path d="M9 12l2 2 4-4"></path></svg></div>
+      <span class="logo" aria-hidden="true"><svg width="36" height="36" viewBox="0 0 48 48"><rect width="48" height="48" rx="12" fill="#fff"></rect><path d="M13 35L24 12l11 23" fill="none" stroke="#0F1F4D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 27.5c3.6-3 8.4-3 12 0" fill="none" stroke="#0F1F4D" stroke-width="3" stroke-linecap="round"></path><circle cx="24" cy="39" r="2.5" fill="#E2453C"></circle></svg></span>
     </sc-if>
-    <h1 class="top-title">{{title}}<small>{{t.officerName}}</small></h1>
+    <h1 class="top-title">{{title}}<sc-if value="{{hasOfficer}}" hint-placeholder-val="{{ true }}"><small>{{officerSub}}</small></sc-if></h1>
     <div class="lang" role="group" aria-label="Language / ភាសា">
       <button class="{{kmCls}}" onClick="{{setKm}}" aria-pressed="{{isKm}}">ខ្មែរ</button>
       <button class="{{enCls}}" onClick="{{setEn}}" aria-pressed="{{isEn}}">EN</button>
@@ -29,192 +32,378 @@
 
   <main class="body">
 
+    <!-- LOG IN / SIGN UP -->
+    <sc-if value="{{is.login}}" hint-placeholder-val="{{ false }}">
+      <section class="hero">
+        <svg width="72" height="72" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#fff"></rect><path d="M13 35L24 12l11 23" fill="none" stroke="#0F1F4D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 27.5c3.6-3 8.4-3 12 0" fill="none" stroke="#0F1F4D" stroke-width="3" stroke-linecap="round"></path><circle cx="24" cy="39" r="2.5" fill="#E2453C"></circle></svg>
+        <h2 class="brand">{{brand}} <span>Officer</span></h2>
+        <p>{{t.oTagline}}</p>
+      </section>
+      <div class="seg" role="tablist" aria-label="{{t.logIn}} / {{t.signUp}}">
+        <button role="tab" class="{{tabLoginCls}}" aria-selected="{{isLogin}}" onClick="{{tabLogin}}">{{t.logIn}}</button>
+        <button role="tab" class="{{tabSignupCls}}" aria-selected="{{isSignup}}" onClick="{{tabSignup}}">{{t.signUp}}</button>
+      </div>
+      <div class="card">
+        <div><h2 class="sec">{{authTitle}}</h2><p class="muted">{{authSub}}</p></div>
+        <sc-if value="{{isLogin}}" hint-placeholder-val="{{ true }}">
+          <div class="field"><label for="l-id">{{t.officerId}}</label><input id="l-id" value="{{loginId}}" placeholder="OF-1024" autocomplete="username" onChange="{{onLoginId}}"></div>
+          <div class="field"><label for="l-pw">{{t.password}}</label><input id="l-pw" type="password" value="{{loginPw}}" placeholder="••••" autocomplete="current-password" onChange="{{onLoginPw}}"></div>
+          <p class="hint-demo">{{t.demoCreds}}</p>
+          <button class="btn" onClick="{{doLogin}}">{{t.logIn}}</button>
+        </sc-if>
+        <sc-if value="{{isSignup}}" hint-placeholder-val="{{ false }}">
+          <div class="field"><label for="s-name">{{t.fullName}}</label><input id="s-name" value="{{suName}}" autocomplete="name" onChange="{{onSuName}}"></div>
+          <div class="field"><label for="s-id">{{t.officerId}}</label><input id="s-id" value="{{suId}}" placeholder="OF-0000" onChange="{{onSuId}}"></div>
+          <div class="field"><span class="lbl">{{t.workplace}}</span>
+            <div class="opts" role="radiogroup" aria-label="{{t.workplace}}">
+              <sc-for list="{{offices}}" as="o" hint-placeholder-count="2"><button role="radio" class="{{o.cls}}" aria-checked="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+            </div>
+          </div>
+          <div class="field"><label for="s-phone">{{t.phone}}</label><input id="s-phone" type="tel" value="{{suPhone}}" placeholder="+855 12 345 678" onChange="{{onSuPhone}}"></div>
+          <div class="field"><label for="s-pw">{{t.password}}</label><input id="s-pw" type="password" value="{{suPw}}" autocomplete="new-password" onChange="{{onSuPw}}"></div>
+          <button class="btn" onClick="{{doSignup}}">{{t.createAcc}}</button>
+        </sc-if>
+        <sc-if value="{{hasAuthErr}}" hint-placeholder-val="{{ false }}"><p class="err" role="alert">{{authErr}}</p></sc-if>
+      </div>
+      <p class="switch">{{switchHint}} <button class="linkbtn" onClick="{{switchMode}}">{{switchCta}}</button></p>
+    </sc-if>
+
     <!-- DASHBOARD -->
     <sc-if value="{{is.dash}}" hint-placeholder-val="{{ true }}">
       <div class="kpis">
-        <div class="kpi hl"><span>{{t.k_pending}}</span><b>{{k.pending}}</b></div>
-        <div class="kpi"><span>{{t.k_new}}</span><b>{{k.newly}}</b></div>
-        <div class="kpi"><span>{{t.k_renew}}</span><b>{{k.renew}}</b></div>
-        <div class="kpi"><span>{{t.k_unpaid}}</span><b>{{k.unpaid}}</b></div>
+        <sc-for list="{{kpis}}" as="k" hint-placeholder-count="6">
+          <div class="{{k.cls}}"><span>{{k.label}}</span><b>{{k.value}}</b><sc-if value="{{k.hasSub}}" hint-placeholder-val="{{ false }}"><small>{{k.sub}}</small></sc-if></div>
+        </sc-for>
       </div>
+
       <div class="card">
-        <h2 class="sec">{{t.byService}}</h2>
-        <div class="bars">
-          <sc-for list="{{bySvc}}" as="b" hint-placeholder-count="4">
-            <div class="bar-row">
-              <div class="lbl"><span>{{b.name}}</span><b>{{b.count}}</b></div>
-              <svg class="track" width="100%" height="10" aria-hidden="true" style="display: block"><rect x="0" y="0" width="100%" height="10" rx="5" fill="{{b.color}}" style="width: {{b.pct}}"></rect></svg>
+        <div><h2 class="sec">{{t.pipeline}}</h2><p class="muted">{{t.pipelineSub}}</p></div>
+        <div class="cols" role="list">
+          <sc-for list="{{pipeline}}" as="p" hint-placeholder-count="7">
+            <button class="col" role="listitem" aria-label="{{p.tip}}" onClick="{{p.open}}">
+              <span class="val">{{p.count}}</span>
+              <span class="plot"><i class="bar" style="{{p.h}}"></i></span>
+              <span class="lab">{{p.label}}</span>
+              <span class="tip" aria-hidden="true">{{p.tip}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-row"><h2 class="sec">{{t.svcMix}}</h2><span class="muted">{{t.total}} {{totalApps}}</span></div>
+        <div class="stack" role="img" aria-label="{{t.svcMix}}">
+          <sc-for list="{{svcMix}}" as="m" hint-placeholder-count="4"><sc-if value="{{m.show}}" hint-placeholder-val="{{ true }}"><i style="{{m.seg}}"><span class="tip">{{m.tip}}</span></i></sc-if></sc-for>
+        </div>
+        <ul class="legend">
+          <sc-for list="{{svcMix}}" as="m" hint-placeholder-count="4">
+            <li><span class="sw" style="{{m.dot}}"></span><span class="nm">{{m.name}}</span><b>{{m.count}}</b><span class="pc">{{m.pctLabel}}</span></li>
+          </sc-for>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="sec-row"><h2 class="sec">{{t.week}}</h2><span class="muted">{{t.total}} {{weekTotal}}</span></div>
+        <div class="cols week" role="list">
+          <sc-for list="{{week}}" as="w" hint-placeholder-count="7">
+            <div class="{{w.cls}}" role="listitem" tabindex="0" aria-label="{{w.tip}}">
+              <span class="val">{{w.count}}</span>
+              <span class="plot"><i class="bar" style="{{w.h}}"></i></span>
+              <span class="lab">{{w.label}}</span>
+              <span class="tip" aria-hidden="true">{{w.tip}}</span>
             </div>
           </sc-for>
         </div>
       </div>
-      <div class="card">
-        <h2 class="sec">{{t.byStage}}</h2>
-        <div class="bars">
-          <sc-for list="{{byStage}}" as="b" hint-placeholder-count="6">
-            <div class="bar-row">
-              <div class="lbl"><span>{{b.name}}</span><b>{{b.count}}</b></div>
-              <svg class="track" width="100%" height="10" aria-hidden="true" style="display: block"><rect x="0" y="0" width="100%" height="10" rx="5" fill="#1D3F8F" style="width: {{b.pct}}"></rect></svg>
-            </div>
-          </sc-for>
-        </div>
+
+      <div class="duo">
+        <button class="btn" onClick="{{goQueuePending}}">{{t.reviewPending}}</button>
+        <button class="btn soft" onClick="{{goScan}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"></path></svg>{{t.scanQr}}</button>
       </div>
-      <div class="card">
-        <h2 class="sec">{{t.lostDamagedAnalytics}}</h2>
-        <div class="kpis">
-          <div class="kpi"><span>{{t.lostIds}}</span><b>{{k.lost}}</b></div>
-          <div class="kpi"><span>{{t.damagedIds}}</span><b>{{k.damaged}}</b></div>
-        </div>
-        <p class="sample">{{t.lostDamagedNote}}</p>
-      </div>
-      <button class="btn" onClick="{{goQueuePending}}">{{t.reviewPending}}</button>
       <p class="sample">{{t.sampleNote}}</p>
+      <button class="linkbtn center" onClick="{{logOut}}">{{t.logOut}}</button>
     </sc-if>
 
     <!-- QUEUE -->
     <sc-if value="{{is.queue}}" hint-placeholder-val="{{ false }}">
-      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input aria-label="{{t.search}}" placeholder="{{t.search}}"></label>
+      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><input aria-label="{{t.search}}" placeholder="{{t.search}}" value="{{search}}" onChange="{{onSearch}}"></label>
       <div class="chips" role="group" aria-label="Filter">
-        <sc-for list="{{filters}}" as="f" hint-placeholder-count="5">
+        <sc-for list="{{filters}}" as="f" hint-placeholder-count="6">
           <button class="{{f.cls}}" onClick="{{f.pick}}" aria-pressed="{{f.on}}">{{f.label}}</button>
         </sc-for>
       </div>
       <sc-for list="{{list}}" as="a" hint-placeholder-count="4">
         <button class="item" onClick="{{a.open}}">
           <span class="avatar" aria-hidden="true">{{a.initials}}</span>
-          <span class="grow"><b>{{a.name}}</b><small>{{a.svcName}} · {{a.no}}</small></span>
+          <span class="grow"><b>{{a.name}}</b><small>{{a.svcName}} · {{a.no}}</small>
+            <sc-if value="{{a.hasReason}}" hint-placeholder-val="{{ false }}"><span class="{{a.reasonCls}}">{{a.reasonLabel}}</span></sc-if>
+          </span>
           <span class="{{a.pillCls}}">{{a.short}}</span>
         </button>
       </sc-for>
       <sc-if value="{{listEmpty}}" hint-placeholder-val="{{ false }}"><p class="muted" style="text-align: center; padding: 24px 0">{{t.empty}}</p></sc-if>
     </sc-if>
 
-    <!-- DETAIL -->
+    <!-- DETAIL / REVIEW -->
     <sc-if value="{{is.detail}}" hint-placeholder-val="{{ false }}">
       <div class="card">
-        <div style="display: flex; align-items: center; gap: 12px">
+        <div class="who">
           <span class="avatar" aria-hidden="true">{{sel.initials}}</span>
-          <div style="flex: 1; min-width: 0"><b style="font-size: 16px">{{sel.name}}</b><p class="muted">{{sel.nameAlt}}</p></div>
+          <div class="grow"><b>{{sel.name}}</b><p class="muted">{{sel.nameAlt}}</p></div>
           <span class="{{sel.pillCls}}">{{sel.short}}</span>
         </div>
-        <div class="hr"></div>
-        <div class="kv"><span>{{t.appNo}}</span><b>{{sel.no}}</b></div>
-        <div class="kv"><span>{{t.service}}</span><b>{{sel.svcName}}</b></div>
-        <div class="kv"><span>{{t.submittedOn}}</span><b>{{sel.date}}</b></div>
-        <div class="kv"><span>{{t.dob}}</span><b>{{sel.dob}}</b></div>
-        <div class="kv"><span>{{t.pob}}</span><b>{{t.pnh}}</b></div>
-        <div class="kv"><span>{{t.payment}}</span><b>{{sel.payLabel}}</b></div>
-        <sc-if value="{{sel.hasQueue}}" hint-placeholder-val="{{ false }}"><div class="kv"><span>{{t.queueNo}}</span><b>{{sel.queue}} · {{sel.apptDate}}</b></div></sc-if>
+        <div class="meta">
+          <span>{{sel.no}}</span><span>{{sel.svcName}}</span><span>{{t.submittedOn}} {{sel.date}}</span>
+          <sc-if value="{{sel.hasReason}}" hint-placeholder-val="{{ false }}"><span class="{{sel.reasonCls}}">{{sel.reasonLabel}}</span></sc-if>
+        </div>
+        <div class="stepper" aria-label="{{sel.stepText}}">
+          <div class="dots"><sc-for list="{{sel.stepDots}}" as="d" hint-placeholder-count="7"><i class="{{d.cls}}"></i></sc-for></div>
+          <small>{{sel.stepText}}</small>
+        </div>
       </div>
 
+      <!-- Review: stage 0–1 -->
+      <sc-if value="{{sel.atReview}}" hint-placeholder-val="{{ true }}">
+        <div class="card">
+          <div class="sec-row"><h2 class="sec">{{t.reviewTitle}}</h2></div>
+          <div class="vprog"><span class="vbar"><i style="{{sel.vBar}}"></i></span><b>{{sel.vProgress}}</b></div>
+          <sc-if value="{{sel.notAllVerified}}" hint-placeholder-val="{{ true }}"><button class="btn soft sm" onClick="{{verifyAll}}">{{t.verifyAllOk}}</button></sc-if>
+          <div class="frows">
+            <sc-for list="{{sel.fields}}" as="f" hint-placeholder-count="8">
+              <div class="{{f.rowCls}}">
+                <div class="fhead"><span class="flabel">{{f.label}}</span><span class="fsrc">{{t.from}} {{f.src}}</span></div>
+                <sc-if value="{{f.flagged}}" hint-placeholder-val="{{ false }}"><span class="fflag"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>{{t.flagged}}</span></sc-if>
+                <sc-if value="{{f.notEditing}}" hint-placeholder-val="{{ true }}">
+                  <div class="fbody">
+                    <b class="fval">{{f.value}}</b>
+                    <button class="ebtn" onClick="{{f.edit}}" aria-label="{{t.edit}} – {{f.label}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>{{t.edit}}</button>
+                    <button class="{{f.verifyCls}}" onClick="{{f.toggle}}" aria-pressed="{{f.isVerified}}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>{{f.verifyLabel}}</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{f.editing}}" hint-placeholder-val="{{ false }}">
+                  <input class="finput" aria-label="{{f.label}}" value="{{editVal}}" onChange="{{f.onEdit}}">
+                  <div class="fbody end">
+                    <button class="ebtn" onClick="{{f.cancel}}">{{t.cancel}}</button>
+                    <button class="vbtn on" onClick="{{f.save}}">{{t.save}}</button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{f.edited}}" hint-placeholder-val="{{ false }}"><small class="fwas">{{t.editedBy}} “{{f.was}}”</small></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <p class="muted">{{t.editNote}}</p>
+        </div>
+      </sc-if>
+
       <div class="card">
-        <h2 class="sec">{{t.uploadedDocs}}</h2>
+        <div><h2 class="sec">{{t.uploadedDocs}}</h2><p class="muted">{{t.tapToView}}</p></div>
         <div class="docs">
           <sc-for list="{{sel.docs}}" as="d" hint-placeholder-count="3">
-            <button aria-label="{{d.aria}}"><span class="thumb" aria-hidden="true"></span>{{d.name}}</button>
+            <button aria-label="{{d.aria}}" onClick="{{d.open}}"><span class="thumb" aria-hidden="true"></span>{{d.name}}</button>
           </sc-for>
         </div>
+        <sc-if value="{{sel.hasEvidence}}" hint-placeholder-val="{{ false }}"><div class="evid"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.4 11.1l-9.2 9.2a6 6 0 0 1-8.5-8.5l9.2-9.2a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 0 1-2.8-2.8l8.5-8.5"></path></svg><span>{{sel.reasonEvidence}}</span></div></sc-if>
+        <sc-if value="{{sel.atReview}}" hint-placeholder-val="{{ true }}">
+          <div class="checks"><sc-for list="{{sel.checks}}" as="c" hint-placeholder-count="3"><span><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>{{c}}</span></sc-for></div>
+        </sc-if>
       </div>
 
-      <div class="card">
-        <h2 class="sec">{{t.autoChecks}}</h2>
-        <sc-for list="{{sel.checks}}" as="c" hint-placeholder-count="3">
-          <div class="chk">
-            <span class="{{c.icCls}}" aria-hidden="true">
-              <sc-if value="{{c.ok}}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
-              <sc-if value="{{c.bad}}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 7v6M12 17h.01"></path></svg></sc-if>
-            </span>
-            <div><b>{{c.title}}</b><small>{{c.sub}}</small></div>
-          </div>
-        </sc-for>
-      </div>
+      <sc-if value="{{sel.atReview}}" hint-placeholder-val="{{ true }}">
+        <button class="btn green" disabled="{{sel.notAllVerified}}" onClick="{{goIssue}}">{{t.acceptQr}}</button>
+        <sc-if value="{{sel.notAllVerified}}" hint-placeholder-val="{{ true }}"><p class="sample">{{t.acceptHint}}</p></sc-if>
+      </sc-if>
 
-      <!-- Actions by stage -->
-      <sc-if value="{{sel.atSubmitted}}" hint-placeholder-val="{{ false }}">
-        <button class="btn" onClick="{{startReview}}">{{t.startReview}}</button>
-      </sc-if>
-      <sc-if value="{{sel.atReview}}" hint-placeholder-val="{{ false }}">
-        <button class="btn green" onClick="{{goSchedule}}">{{t.verifyAccept}}</button>
-        <button class="btn outline" onClick="{{requestFix}}">{{t.requestFix}}</button>
-      </sc-if>
-      <sc-if value="{{sel.atVerified}}" hint-placeholder-val="{{ false }}">
+      <!-- Stage 2: QR issued, waiting for on-site visit -->
+      <sc-if value="{{sel.atQr}}" hint-placeholder-val="{{ false }}">
         <div class="card">
-          <h2 class="sec">{{t.payment}}</h2>
-          <p class="muted">{{t.awaitPay}}</p>
-          <button class="btn" onClick="{{markCash}}">{{t.markCash}}</button>
+          <h2 class="sec">{{t.qrIssued}} · {{sel.qrIssuedOn}}</h2>
+          <sc-if value="{{sel.qrOk}}" hint-placeholder-val="{{ true }}">
+            <p class="muted">{{t.waitVisit}}</p>
+            <div class="kv"><span>{{t.validUntil}}</span><b>{{sel.qrUntil}} · {{sel.qrDaysLeft}}</b></div>
+            <button class="btn" onClick="{{scanFromDetail}}">{{t.scanBtn}}</button>
+          </sc-if>
+          <sc-if value="{{sel.qrBad}}" hint-placeholder-val="{{ false }}">
+            <div class="res bad"><b>{{t.qrExpired}} {{sel.qrUntil}}</b></div>
+            <button class="btn" onClick="{{reissue}}">{{t.reissue}}</button>
+          </sc-if>
         </div>
       </sc-if>
-      <sc-if value="{{sel.atPaid}}" hint-placeholder-val="{{ false }}">
+
+      <!-- Stage 2 checked in: biometrics first -->
+      <sc-if value="{{sel.atBio}}" hint-placeholder-val="{{ false }}">
         <div class="card">
-          <h2 class="sec">{{t.onsite}}</h2>
+          <div class="sec-row"><h2 class="sec">{{t.onsite}}</h2><span class="pill violet">{{t.checkedInQ}} {{sel.queue}}</span></div>
           <div class="bio">
             <sc-for list="{{bioItems}}" as="b" hint-placeholder-count="4">
               <label><input type="checkbox" checked="{{b.on}}" onChange="{{b.toggle}}"><span>{{b.label}}</span></label>
             </sc-for>
           </div>
-          <button class="btn green" disabled="{{bioIncomplete}}" onClick="{{markBio}}">{{t.markBio}}</button>
+          <button class="btn green" disabled="{{bioIncomplete}}" onClick="{{markBio}}">{{t.updateBio}}</button>
         </div>
       </sc-if>
-      <sc-if value="{{sel.atBio}}" hint-placeholder-val="{{ false }}">
-        <button class="btn green" onClick="{{markReady}}">{{t.markReady}}</button>
+
+      <!-- Stage 3: payment after biometrics -->
+      <sc-if value="{{sel.atPay}}" hint-placeholder-val="{{ false }}">
+        <div class="card">
+          <h2 class="sec">{{t.payTitle}}</h2>
+          <sc-if value="{{sel.onlineWait}}" hint-placeholder-val="{{ true }}"><p class="muted">{{t.waitOnline}}</p></sc-if>
+          <sc-if value="{{sel.cashChosen}}" hint-placeholder-val="{{ false }}"><p class="muted">{{t.cashChosen}}</p></sc-if>
+          <button class="btn" onClick="{{markCash}}">{{t.markCash}}</button>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{sel.atPaid}}" hint-placeholder-val="{{ false }}">
+        <div class="card">
+          <div class="kv"><span>{{t.paidNote}}</span><b>{{sel.payLabel}}</b></div>
+          <button class="btn" onClick="{{toProgress}}">{{t.toProgress}}</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{sel.atProgress}}" hint-placeholder-val="{{ false }}">
+        <div class="card">
+          <p class="muted">{{t.progressNote}}</p>
+          <button class="btn green" onClick="{{markDone}}">{{t.markDone}}</button>
+        </div>
       </sc-if>
       <sc-if value="{{sel.atReady}}" hint-placeholder-val="{{ false }}">
-        <p class="muted" style="text-align: center">{{t.allDone}}</p>
+        <div class="res ok"><b>{{t.allDone}} {{sel.pickBy}}</b></div>
+      </sc-if>
+
+      <sc-if value="{{sel.showDetails}}" hint-placeholder-val="{{ false }}">
+        <div class="card">
+          <h2 class="sec">{{t.details}}</h2>
+          <sc-for list="{{sel.details}}" as="d" hint-placeholder-count="8"><div class="kv"><span>{{d.label}}</span><b>{{d.value}}</b></div></sc-for>
+          <div class="hr"></div>
+          <div class="kv"><span>{{t.payment}}</span><b>{{sel.payLabel}}</b></div>
+          <sc-if value="{{sel.hasQueue}}" hint-placeholder-val="{{ false }}"><div class="kv"><span>{{t.queueNo}}</span><b>{{sel.queue}}</b></div></sc-if>
+        </div>
       </sc-if>
     </sc-if>
 
-    <!-- SCHEDULE -->
-    <sc-if value="{{is.schedule}}" hint-placeholder-val="{{ false }}">
+    <!-- ACCEPT & ISSUE QR -->
+    <sc-if value="{{is.issue}}" hint-placeholder-val="{{ false }}">
       <div class="card">
         <div class="kv"><span>{{t.applicant}}</span><b>{{sel.name}}</b></div>
+        <div class="kv"><span>{{t.appNo}}</span><b>{{sel.no}}</b></div>
         <div class="kv"><span>{{t.service}}</span><b>{{sel.svcName}}</b></div>
       </div>
-      <h2 class="sec">{{t.pickDate}}</h2>
-      <div class="slots">
-        <sc-for list="{{dates}}" as="d" hint-placeholder-count="4">
-          <button class="{{d.cls}}" onClick="{{d.pick}}" aria-pressed="{{d.on}}">{{d.label}}</button>
-        </sc-for>
+      <div class="qr-card">
+        <b>{{t.qrPreview}}</b>
+        <img class="qr-img" src="{{issueQr}}" alt="QR: {{sel.no}}">
+        <small>{{t.qrContains}}</small>
+        <span class="qr-valid">{{t.validFor}} {{issueUntil}}</span>
       </div>
-      <h2 class="sec">{{t.pickTime}}</h2>
-      <div class="slots">
-        <sc-for list="{{times}}" as="d" hint-placeholder-count="4">
-          <button class="{{d.cls}}" onClick="{{d.pick}}" aria-pressed="{{d.on}}">{{d.label}}</button>
-        </sc-for>
+      <p class="muted">{{t.issueNote}}</p>
+      <button class="btn green" onClick="{{confirmIssue}}">{{t.confirmNotify}}</button>
+    </sc-if>
+
+    <!-- SCAN -->
+    <sc-if value="{{is.scan}}" hint-placeholder-val="{{ false }}">
+      <div class="viewfinder">
+        <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+        <sc-if value="{{scan.scanning}}" hint-placeholder-val="{{ false }}"><div class="beam"></div><p class="vf-text" aria-live="polite">{{t.scanning}}</p></sc-if>
+        <sc-if value="{{scan.idle}}" hint-placeholder-val="{{ true }}"><p class="vf-text">{{t.scanSub}}</p></sc-if>
+        <sc-if value="{{scan.result}}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{scan.valid}}" hint-placeholder-val="{{ false }}"><span class="vf-badge ok" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></span></sc-if>
+          <sc-if value="{{scan.expired}}" hint-placeholder-val="{{ false }}"><span class="vf-badge bad" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></sc-if>
+        </sc-if>
       </div>
-      <div class="qbox">
-        <div><small>{{t.autoQueue}}</small><strong>{{nextQueue}}</strong></div>
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10"></path></svg>
-      </div>
-      <p class="muted">{{t.notifyNote}}</p>
-      <button class="btn green" onClick="{{confirmAccept}}">{{t.confirmNotify}}</button>
+
+      <sc-if value="{{scan.result}}" hint-placeholder-val="{{ false }}">
+        <sc-if value="{{scan.valid}}" hint-placeholder-val="{{ false }}">
+          <div class="res ok" role="status">
+            <b>{{t.resValid}}</b>
+            <div class="kv"><span>{{t.fullName}}</span><b>{{scan.app.name}}</b></div>
+            <div class="kv"><span>{{t.appNo}}</span><b>{{scan.app.no}}</b></div>
+            <div class="kv"><span>{{t.service}}</span><b>{{scan.app.svcName}}</b></div>
+            <div class="kv"><span>{{t.validUntil}}</span><b>{{scan.until}}</b></div>
+          </div>
+          <button class="btn green" onClick="{{checkIn}}">{{t.checkIn}}</button>
+        </sc-if>
+        <sc-if value="{{scan.expired}}" hint-placeholder-val="{{ false }}">
+          <div class="res bad" role="alert">
+            <b>{{t.resExpired}}</b>
+            <p>{{t.resExpiredSub}} {{scan.until}}.</p>
+            <div class="kv"><span>{{t.fullName}}</span><b>{{scan.app.name}}</b></div>
+            <div class="kv"><span>{{t.appNo}}</span><b>{{scan.app.no}}</b></div>
+          </div>
+          <button class="btn" onClick="{{reissue}}">{{t.reissue}}</button>
+        </sc-if>
+        <sc-if value="{{scan.checked}}" hint-placeholder-val="{{ false }}">
+          <div class="res info" role="status"><b>{{t.resChecked}}</b><p>{{scan.app.name}} · {{scan.app.no}} · {{scan.app.status}}</p></div>
+          <button class="btn" onClick="{{openScanned}}">{{t.openApp}}</button>
+        </sc-if>
+        <sc-if value="{{scan.wrong}}" hint-placeholder-val="{{ false }}">
+          <div class="res bad" role="alert"><b>{{t.resWrongStage}}</b><p>{{scan.app.name}} · {{scan.app.no}} · {{scan.app.status}}</p></div>
+          <button class="btn" onClick="{{openScanned}}">{{t.openApp}}</button>
+        </sc-if>
+        <sc-if value="{{scan.missing}}" hint-placeholder-val="{{ false }}"><div class="res bad" role="alert"><b>{{t.resNotFound}}</b></div></sc-if>
+        <button class="btn soft" onClick="{{scanAgain}}">{{t.scanAgain}}</button>
+      </sc-if>
+
+      <sc-if value="{{scan.idle}}" hint-placeholder-val="{{ true }}">
+        <div class="card">
+          <h2 class="sec">{{t.demoPick}}</h2>
+          <sc-for list="{{scan.waiting}}" as="w" hint-placeholder-count="3">
+            <button class="item flat" onClick="{{w.pick}}">
+              <img class="qr-thumb" src="{{w.qr}}" alt="">
+              <span class="grow"><b>{{w.name}}</b><small>{{w.no}} · {{w.svcName}}</small><small class="{{w.vCls}}">{{w.validity}}</small></span>
+            </button>
+          </sc-for>
+          <sc-if value="{{scan.noWaiting}}" hint-placeholder-val="{{ false }}"><p class="muted">{{t.noWaiting}}</p></sc-if>
+        </div>
+        <div class="card">
+          <h2 class="sec">{{t.manual}}</h2>
+          <div class="inline-form"><input aria-label="{{t.appNo}}" placeholder="KH-2611-0131" value="{{scan.no}}" onChange="{{onScanNo}}"><button class="btn" onClick="{{findNo}}">{{t.find}}</button></div>
+        </div>
+      </sc-if>
     </sc-if>
 
     <!-- PAYMENTS -->
     <sc-if value="{{is.payments}}" hint-placeholder-val="{{ false }}">
-      <div class="kpis">
-        <div class="kpi"><span>{{t.k_unpaid}}</span><b>{{k.unpaid}}</b></div>
-        <div class="kpi"><span>{{t.k_paid}}</span><b>{{k.paid}}</b></div>
+      <div class="kpis three">
+        <div class="kpi hl"><span>{{t.k_unpaid}}</span><b>{{kUnpaid}}</b></div>
+        <div class="kpi"><span>{{t.k_paidOnline}}</span><b>{{kPaidOnline}}</b></div>
+        <div class="kpi"><span>{{t.k_paidCash}}</span><b>{{kPaidCash}}</b></div>
       </div>
+      <p class="muted">{{t.payAuto}}</p>
       <sc-for list="{{payList}}" as="a" hint-placeholder-count="4">
-        <button class="item" onClick="{{a.open}}">
-          <span class="avatar" aria-hidden="true">{{a.initials}}</span>
-          <span class="grow"><b>{{a.name}}</b><small>{{a.no}} · [FEE]</small></span>
-          <span class="{{a.payCls}}">{{a.payLabel}}</span>
-        </button>
+        <div class="item">
+          <button class="item-open" onClick="{{a.open}}">
+            <span class="avatar" aria-hidden="true">{{a.initials}}</span>
+            <span class="grow"><b>{{a.name}}</b><small>{{a.no}} · [FEE]</small><span class="{{a.payCls}}">{{a.payLabel}}</span></span>
+          </button>
+          <sc-if value="{{a.canCash}}" hint-placeholder-val="{{ false }}"><button class="mini" onClick="{{a.markCash}}">{{t.markCash}}</button></sc-if>
+        </div>
       </sc-for>
     </sc-if>
 
   </main>
 
+  <!-- Document preview overlay -->
+  <sc-if value="{{hasDocView}}" hint-placeholder-val="{{ false }}">
+    <div class="overlay" role="dialog" aria-modal="true" aria-label="{{docView.name}}">
+      <div class="sheet">
+        <div class="sec-row"><h2 class="sec">{{docView.name}}</h2><button class="linkbtn" onClick="{{closeDoc}}">{{t.close}}</button></div>
+        <div class="docmock"><div class="ph"></div><div class="ln"><i style="width:85%"></i><i style="width:60%"></i><i style="width:92%"></i><i style="width:48%"></i><i style="width:70%"></i><i style="width:55%"></i></div><span>{{t.docDemo}}</span></div>
+        <h3 class="sub">{{t.fieldsFromDoc}}</h3>
+        <sc-for list="{{docView.fields}}" as="f" hint-placeholder-count="3"><div class="kv"><span>{{f.label}}</span><b>{{f.value}}</b></div></sc-for>
+        <button class="btn" onClick="{{closeDoc}}">{{t.close}}</button>
+      </div>
+    </div>
+  </sc-if>
+
   <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
     <div class="toast" role="status"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg><span>{{toast}}</span></div>
   </sc-if>
 
-  <nav class="nav" aria-label="Main">
-    <button class="{{nav.dash}}" onClick="{{goDash}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>{{t.navDash}}</button>
-    <button class="{{nav.queue}}" onClick="{{goQueue}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg>{{t.navQueue}}</button>
-    <button class="{{nav.payments}}" onClick="{{goPayments}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>{{t.navPay}}</button>
-  </nav>
+  <sc-if value="{{showNav}}" hint-placeholder-val="{{ true }}">
+    <nav class="nav" aria-label="Main">
+      <button class="{{nav.dash}}" onClick="{{goDash}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path></svg>{{t.navDash}}</button>
+      <button class="{{nav.queue}}" onClick="{{goQueue}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg>{{t.navQueue}}</button>
+      <button class="{{nav.scan}}" onClick="{{goScan}}"><span class="scan-fab" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"></path></svg></span>{{t.navScan}}</button>
+      <button class="{{nav.payments}}" onClick="{{goPayments}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg>{{t.navPay}}</button>
+    </nav>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"startLanguage":{"editor":"enum","options":["km","en"],"default":"km"},"$preview":{"width":390,"height":844}}' src="./Officer.dc.js"></script>

@@ -1,78 +1,83 @@
-# ID & Passport App Prototype (Khmer / English)
+# Atta – ID & Passport App Prototype (Khmer / English)
 
-A clickable mobile prototype with two apps:
+A clickable mobile prototype with two apps that share the same demo data:
 
-- `project/Main.dc.html`: citizen app (OTP demo authentication, digital ID/passport copies, expiry reminders, ID renewal reason/evidence, documents, OCR auto-fill, review, submit, tracking, payment, appointment/queue, info, assistant, alerts)
-- `project/Main.dc.css`: citizen app styles
-- `project/Main.dc.js`: citizen app logic and translations
-- `project/Officer.dc.html`: government officer app (dashboard including lost/damaged ID analytics, application queue, review/verify, scheduling with queue number, payments, on-site biometrics, ready for pickup)
-- `project/Officer.dc.css`: officer app styles
-- `project/Officer.dc.js`: officer app logic and translations
-- `project/canvas.json`: the canvas layout (frame positions and titles)
+- **Citizen app** (`project/Main.dc.html`): sign in or create an account (OTP demo), apply for or renew an ID card or passport, upload the documents required for the chosen reason (expired, lost or damaged), OCR auto-fill, review, submit, track a 7-step progress, show an on-site QR code, pay, and get alerts.
+- **Officer app** (`project/Officer.dc.html`): log in or sign up, dashboard, review each application field by field (and correct it directly), accept and issue a QR code, scan the citizen's QR code on-site, capture biometrics, confirm payment, move to In progress, and mark Done.
+
+Open `project/both.html` to see both apps side by side. Officer actions show up in the citizen app straight away.
+
+## Demo logins
+
+| App | How to sign in |
+|---|---|
+| Citizen | Any phone number, code `123456`. "Create account" also asks for a full name. |
+| Officer | `OF-1024` / `1234`, or use "Sign up" to create a new officer account. |
+
+## Application flow
+
+| Step | Citizen sees | Officer does |
+|---|---|---|
+| 1 Submitted | Application received | Opens it (moves to Under review automatically) |
+| 2 Under review | Officer is checking | Verifies every field against the documents. Low-confidence OCR fields are listed first. Wrong values are edited directly; the citizen does not need to resubmit. |
+| 3 Verified & accepted | Gets a **QR code** (full name + application no.), valid for **1 week** | Accept & issue QR |
+| 4 On-site: fingerprint & photo | Comes on-site within 1 week | **Scans the QR code** (expired codes are rejected and can be reissued), checks the citizen in with a queue number, then clicks **Update biometrics** |
+| 5 Payment | Pays online (KHQR / card) or chooses cash | Online payments update automatically; cash is marked by the officer |
+| 6 In progress | Document is being printed | Move to In progress |
+| 7 Ready for pickup | Pick up within 1 week after the notice | Done – ready for pickup |
+
+## Required documents (shown in the app)
+
+| Service | New | Renewal – expired | Replacement – lost | Replacement – damaged |
+|---|---|---|---|---|
+| ID card | Birth certificate; family book or residence book | Current ID card; family book or residence book | Police certificate of loss; family book or residence book; birth certificate | Photo of the damaged ID card (hand in the card on-site); family book or residence book |
+| Passport | Khmer national ID card; birth certificate; family book | Current passport; Khmer national ID card | Police certificate of loss; Khmer national ID card; copy of old passport (if available) | Photo of the damaged passport (hand it in on-site); Khmer national ID card |
+
+These lists are based on public news and embassy sources, not an official checklist. **Check them with the General Department of Identification before presenting.** The rules are in `REQ` in `project/shared.js`.
 
 ## How the files work
 
-Each `.dc.html` file is one screen-set written in the Claude Design canvas format:
+- `project/shared.js`: the shared demo data (localStorage), required-document rules, QR helpers and the app name (`BRAND`).
+- `project/Main.dc.*` and `project/Officer.dc.*`: each app's markup (Claude Design canvas format), logic + translations (`T.en`, `T.km`) and styles.
+- `project/support.js`: a small runtime that renders the `.dc.html` templates locally. It is a demo runtime, not a production framework.
+- `project/vendor/qrcode.min.js`: [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) 1.4.4 (MIT) for real, scannable QR codes.
+- `project/index.html`: start page, with a **Reset demo data** button.
 
-- The HTML markup inside `<x-dc>` is the UI. `{{name}}` holes pull values from `renderVals()`.
-- `<sc-if value="{{...}}">` shows or hides a block. `<sc-for list="{{...}}" as="item">` repeats a block.
-- The citizen app's logic and translations are in `project/Main.dc.js`. The texts for both languages are in the `T` object (`T.en` and `T.km`).
-- The citizen app's styles are in `project/Main.dc.css`; the officer app's logic and styles are in `project/Officer.dc.js` and `project/Officer.dc.css`.
+Template basics: `{{name}}` holes pull values from `renderVals()`, `<sc-if value="{{...}}">` shows or hides a block, and `<sc-for list="{{...}}" as="item">` repeats a block.
 
 ## Run the local demo
-
-The local demo includes a lightweight `support.js` runtime for these prototype templates. From a terminal, serve the `project` folder:
 
 ```sh
 python3 -m http.server 8000 --directory project
 ```
 
-Then open `http://localhost:8000` and choose the citizen or officer app. Keep the HTML, CSS, JS, and `support.js` files together in `project`. Use the citizen demo OTP `123456`.
-
-The `.dc.html` files retain the canvas-style templates, while `support.js` provides the runtime needed to preview this prototype locally. It is a demo runtime, not a production framework.
+Open `http://localhost:8000`. Keep all files in `project` together.
 
 ## Run with Docker
-
-With Docker Compose installed, run this from the repository folder:
 
 ```sh
 docker compose up --build
 ```
 
-Open `http://localhost:8080` and choose the citizen or officer app. Stop the demo with `Ctrl+C`; if you started it in the background, use `docker compose down`.
+Open `http://localhost:8080`. Stop with `Ctrl+C` (or `docker compose down` if started in the background).
 
-To share the source, send the project folder including `Dockerfile` and `docker-compose.yml`; teammates can run the same command to build and start it.
-
-To share the built image instead, create an archive:
+To share the built image:
 
 ```sh
 docker compose build
 docker save -o id-passport-demo.tar id-passport-demo:latest
-```
-
-Send `id-passport-demo.tar` to teammates. They can load and run it with:
-
-```sh
+# teammates:
 docker load -i id-passport-demo.tar
 docker run --rm -p 8080:80 id-passport-demo:latest
 ```
 
 ## Placeholders to fill in
 
-Search for `[` to find them: `[FEE]`, `[TOTAL]`, `[OFFICE NAME]`, `[PHONE]`, `[EMAIL]`, `[CHANNEL]`, `[DISTANCE]`, and the working hours.
+Search for `[` to find them: `[FEE]`, `[TOTAL]`, `[PHONE]`, `[EMAIL]`, `[CHANNEL]`, `[FACEBOOK PAGE]`, `[WEBSITE]`, `[DISTANCE]` and the working hours. No official hotline or email was found online, so the contact details are still placeholders.
 
 ## Notes
 
-- All names and applications are sample data.
-- The citizen app and officer app don't share data. The "Next step" demo button in the citizen app simulates the officer's actions.
+- All names and applications are sample data. Nothing connects to government records, real SMS, real uploads, real payments or production eKYC.
+- Both apps must be opened from the same address (for example `localhost:8000`) to share data. If the browser blocks storage, each app still works on its own.
+- The QR scan is simulated: the officer picks the QR code "in front of the camera" or types the application number.
 - Have a native speaker review the Khmer text before presenting.
-
-## Added hackathon prototype features
-
-- Citizen registration uses full name and phone number; the OTP is simulated. Demo code: `123456`.
-- The sample passport expiry is within six months, so the citizen dashboard displays a renewal reminder.
-- `Show my ID` and `Show my passport` screens display mock digital document copies.
-- ID renewal supports `Expired`, `Lost`, and `Damaged` reasons. Lost/damaged cases require a simulated evidence attachment before continuing.
-- Officer dashboard counts sample lost and damaged ID renewal cases separately.
-
-These are demonstration interactions and do not connect to government records, real SMS, real document uploads, or production eKYC.
