@@ -1,0 +1,7 @@
+services:
+  demo:
+    image: id-passport-demo:latest
+    build:
+      context: .
+    ports:
+      - "8080:80"

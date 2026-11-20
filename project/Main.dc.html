@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="km">
+<head>
+<meta charset="utf-8">
+<title>Citizen app – ID and passport services</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./Main.dc.css">
+</helmet>
+<div class="app">
+  <header class="top">
+    <sc-if value="{{showBack}}" hint-placeholder-val="{{ false }}">
+      <button class="icon-btn" aria-label="{{t.back}}" onClick="{{goBack}}"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"></path></svg></button>
+    </sc-if>
+    <sc-if value="{{showLogo}}" hint-placeholder-val="{{ true }}">
+      <div class="logo" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M6 16c.6-1.5 1.7-2 3-2s2.4.5 3 2M14 10h4M14 13h3"></path></svg></div>
+    </sc-if>
+    <h1 class="top-title">{{title}}</h1>
+    <div class="lang" role="group" aria-label="Language / ភាសា">
+      <button class="{{kmCls}}" onClick="{{setKm}}" aria-pressed="{{isKm}}">ខ្មែរ</button>
+      <button class="{{enCls}}" onClick="{{setEn}}" aria-pressed="{{isEn}}">EN</button>
+    </div>
+  </header>
+
+  <main class="body">
+
+    <!-- AUTHENTICATION -->
+    <sc-if value="{{is.auth}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <h2 class="sec">{{t.authTitle}}</h2>
+        <p class="muted">{{t.authSub}}</p>
+        <label>{{t.fullName}}</label><input value="{{authName}}" placeholder="{{t.fullNamePlaceholder}}" onChange="{{onAuthName}}">
+        <label>{{t.phone}}</label><input value="{{authPhone}}" placeholder="+855 12 345 678" onChange="{{onAuthPhone}}">
+        <sc-if value="{{otpSent}}" hint-placeholder-val="{{ false }}">
+          <label>{{t.otpLabel}}</label><input value="{{authOtp}}" placeholder="123456" onChange="{{onAuthOtp}}">
+          <p class="muted">{{t.otpDemo}}</p>
+          <button class="btn" onClick="{{verifyOtp}}">{{t.verifyOtp}}</button>
+        </sc-if>
+        <sc-if value="{{otpNotSent}}" hint-placeholder-val="{{ true }}"><button class="btn" onClick="{{sendOtp}}">{{t.sendOtp}}</button></sc-if>
+      </div>
+    </sc-if>
+
+    <!-- HOME -->
+    <sc-if value="{{is.home}}" hint-placeholder-val="{{ true }}">
+      <section class="hello">
+        <p>{{t.hello}}</p>
+        <strong>{{t.userName}}</strong>
+        <p>{{t.helloSub}}</p>
+      </section>
+
+      <sc-if value="{{showExpiry}}" hint-placeholder-val="{{ true }}">
+        <section class="alert" aria-live="polite">
+          <div class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></div>
+          <div style="flex: 1">
+            <h3>{{t.expTitle}}</h3>
+            <p>{{t.expBody}}</p>
+            <button class="btn amber" style="height: 44px; width: auto" onClick="{{startRenewPass}}">{{t.renewNow}}</button>
+          </div>
+        </section>
+      </sc-if>
+
+      <h2 class="sec">{{t.services}}</h2>
+      <div class="svc-grid">
+        <button class="svc" onClick="{{startNewId}}">
+          <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="9" cy="11" r="2"></circle><path d="M6 16c.6-1.5 1.7-2 3-2s2.4.5 3 2M14 10h4M14 13h3"></path></svg></span>
+          <b>{{t.svc_newId}}</b><small>{{t.firstTime}}</small>
+        </button>
+        <button class="svc" onClick="{{startRenewId}}">
+          <span class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg></span>
+          <b>{{t.svc_renewId}}</b><small>{{t.expiredLost}}</small>
+        </button>
+        <button class="svc" onClick="{{startNewPass}}">
+          <span class="ic red" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="2"></rect><circle cx="12" cy="10" r="3"></circle><path d="M9 17h6"></path></svg></span>
+          <b>{{t.svc_newPass}}</b><small>{{t.firstTime}}</small>
+        </button>
+        <button class="svc" onClick="{{startRenewPass}}">
+          <span class="ic red" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"></path><path d="M21 4v5h-5"></path></svg></span>
+          <b>{{t.svc_renewPass}}</b><small>{{t.expiredLost}}</small>
+        </button>
+      </div>
+
+      <h2 class="sec">{{t.myDocuments}}</h2>
+      <div class="svc-grid">
+        <button class="svc" onClick="{{showMyId}}"><b>{{t.showMyId}}</b><small>{{t.viewDocument}}</small></button>
+        <button class="svc" onClick="{{showMyPassport}}"><b>{{t.showMyPassport}}</b><small>{{t.viewDocument}}</small></button>
+      </div>
+
+      <h2 class="sec">{{t.myApps}}</h2>
+      <sc-for list="{{apps}}" as="a" hint-placeholder-count="1">
+        <button class="row-btn" onClick="{{a.open}}">
+          <span class="grow"><b>{{a.svcName}}</b><small>{{a.no}} · {{a.date}}</small></span>
+          <span class="{{a.pillCls}}">{{a.status}}</span>
+        </button>
+      </sc-for>
+
+      <h2 class="sec">{{t.helpInfo}}</h2>
+      <div class="quick">
+        <button onClick="{{goInfo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>{{t.hours}}</button>
+        <button onClick="{{goInfo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>{{t.nearest}}</button>
+        <button onClick="{{goAssistant}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>{{t.askAi}}</button>
+      </div>
+    </sc-if>
+
+    <!-- MY ID / PASSPORT -->
+    <sc-if value="{{is.myId}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <h2 class="sec">{{t.showMyId}}</h2>
+        <div class="idmock"><div class="ph"></div><div class="ln"><i style="width:80%"></i><i style="width:60%"></i><i style="width:90%"></i><i style="width:50%"></i></div></div>
+        <div class="kv"><span>{{t.f_nameEn}}</span><b>SOK DARA</b></div><div class="kv"><span>{{t.f_nameKm}}</span><b>សុខ ដារា</b></div><div class="kv"><span>{{t.documentNumber}}</span><b>012345678</b></div><div class="kv"><span>{{t.expiryDate}}</span><b>18/04/2031</b></div>
+        <p class="muted">{{t.documentDemoNote}}</p>
+      </div>
+    </sc-if>
+    <sc-if value="{{is.myPassport}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <h2 class="sec">{{t.showMyPassport}}</h2>
+        <div class="idmock"><div class="ph"></div><div class="ln"><i style="width:80%"></i><i style="width:60%"></i><i style="width:90%"></i><i style="width:50%"></i></div></div>
+        <div class="kv"><span>{{t.f_nameEn}}</span><b>SOK DARA</b></div><div class="kv"><span>{{t.documentNumber}}</span><b>N01234567</b></div><div class="kv"><span>{{t.expiryDate}}</span><b>18/04/2027</b></div>
+        <p class="muted">{{t.documentDemoNote}}</p>
+      </div>
+    </sc-if>
+
+    <!-- APPLICATION LIST -->
+    <sc-if value="{{is.apps}}" hint-placeholder-val="{{ false }}">
+      <p class="muted">{{t.appsIntro}}</p>
+      <sc-for list="{{apps}}" as="a" hint-placeholder-count="2">
+        <button class="row-btn" onClick="{{a.open}}">
+          <span class="grow"><b>{{a.svcName}}</b><small>{{a.no}} · {{a.date}}</small></span>
+          <span class="{{a.pillCls}}">{{a.status}}</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+      </sc-for>
+      <button class="btn soft" onClick="{{goHome}}">{{t.newApp}}</button>
+    </sc-if>
+
+    <!-- DOCUMENTS -->
+    <sc-if value="{{is.docs}}" hint-placeholder-val="{{ false }}">
+      <div class="steps" aria-label="Progress">
+        <div class="on"><i></i>{{t.step1}}</div><div><i></i>{{t.step2}}</div><div><i></i>{{t.step3}}</div>
+      </div>
+      <div>
+        <h2 class="sec" style="margin: 0">{{svcName}}</h2>
+        <p class="muted">{{t.docsIntro}}</p>
+      </div>
+      <sc-if value="{{isRenewId}}" hint-placeholder-val="{{ false }}">
+        <div class="card">
+          <h2 class="sec">{{t.renewReason}}</h2>
+          <div class="chips">
+            <button class="{{reasonExpiredCls}}" onClick="{{chooseExpired}}">{{t.reasonExpired}}</button>
+            <button class="{{reasonLostCls}}" onClick="{{chooseLost}}">{{t.reasonLost}}</button>
+            <button class="{{reasonDamagedCls}}" onClick="{{chooseDamaged}}">{{t.reasonDamaged}}</button>
+          </div>
+          <sc-if value="{{needsEvidence}}" hint-placeholder-val="{{ false }}">
+            <div class="note"><span>{{t.evidenceRequired}}</span></div>
+            <button class="btn soft" onClick="{{uploadEvidence}}">{{t.uploadEvidence}}</button>
+            <p class="muted">{{evidenceStatus}}</p>
+          </sc-if>
+        </div>
+      </sc-if>
+      <sc-for list="{{docs}}" as="d" hint-placeholder-count="3">
+        <div class="{{d.cls}}">
+          <span class="ic" aria-hidden="true">
+            <sc-if value="{{d.ok}}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg></sc-if>
+            <sc-if value="{{d.notOk}}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5"></path></svg></sc-if>
+          </span>
+          <div class="grow"><b>{{d.name}}</b><small>{{d.sub}}</small></div>
+          <button class="mini" onClick="{{d.toggle}}" aria-label="{{d.aria}}">{{d.action}}</button>
+        </div>
+      </sc-for>
+      <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg><span>{{t.docsNote}}</span></div>
+      <div style="flex: 1"></div>
+      <button class="btn" disabled="{{docsIncomplete}}" onClick="{{startOcr}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"></path></svg>{{t.scanFill}}</button>
+    </sc-if>
+
+    <!-- OCR -->
+    <sc-if value="{{is.ocr}}" hint-placeholder-val="{{ false }}">
+      <div class="steps" aria-label="Progress">
+        <div class="on"><i></i>{{t.step1}}</div><div class="on"><i></i>{{t.step2}}</div><div><i></i>{{t.step3}}</div>
+      </div>
+      <div class="scan">
+        <div class="idmock"><div class="ph"></div><div class="ln"><i style="width: 80%"></i><i style="width: 60%"></i><i style="width: 90%"></i><i style="width: 50%"></i><i style="width: 70%"></i></div></div>
+        <sc-if value="{{scanning}}" hint-placeholder-val="{{ true }}"><div class="beam"></div></sc-if>
+      </div>
+      <sc-if value="{{scanning}}" hint-placeholder-val="{{ true }}">
+        <div class="card" aria-live="polite" style="align-items: center; text-align: center">
+          <b style="font-size: 16px">{{t.reading}}</b>
+          <p class="muted">{{t.readingSub}}</p>
+        </div>
+      </sc-if>
+      <sc-if value="{{scanDone}}" hint-placeholder-val="{{ false }}">
+        <div class="card" aria-live="polite">
+          <div style="display: flex; gap: 12px; align-items: center">
+            <span style="width: 40px; height: 40px; border-radius: 50%; background: #DCFCE7; color: #166534; display: grid; place-items: center; flex: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></span>
+            <div><b style="font-size: 15px">{{t.ocrDone}}</b><p class="muted">{{t.ocrDoneSub}}</p></div>
+          </div>
+        </div>
+        <div style="flex: 1"></div>
+        <button class="btn" onClick="{{goReview}}">{{t.reviewForm}}</button>
+      </sc-if>
+    </sc-if>
+
+    <!-- REVIEW -->
+    <sc-if value="{{is.review}}" hint-placeholder-val="{{ false }}">
+      <div class="steps" aria-label="Progress">
+        <div class="on"><i></i>{{t.step1}}</div><div class="on"><i></i>{{t.step2}}</div><div><i></i>{{t.step3}}</div>
+      </div>
+      <div class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"></path></svg><span>{{t.autoNote}}</span></div>
+      <div class="card">
+        <sc-for list="{{fields}}" as="f" hint-placeholder-count="6">
+          <div class="{{f.cls}}">
+            <label for="{{f.id}}">{{f.label}}<span class="ocr-tag">OCR</span></label>
+            <input id="{{f.id}}" value="{{f.value}}" onChange="{{f.onChange}}">
+            <sc-if value="{{f.warn}}" hint-placeholder-val="{{ false }}"><span class="hint"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>{{t.checkField}}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <label class="check"><input type="checkbox" checked="{{agree}}" onChange="{{toggleAgree}}"><span>{{t.confirm}}</span></label>
+      <button class="btn" disabled="{{notAgree}}" onClick="{{submit}}">{{t.submit}}</button>
+    </sc-if>
+
+    <!-- SUBMITTED -->
+    <sc-if value="{{is.done}}" hint-placeholder-val="{{ false }}">
+      <div class="done">
+        <div class="big"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></div>
+        <h2>{{t.submitted}}</h2>
+        <div class="appno">{{t.appNo}}<b>{{lastNo}}</b></div>
+        <p class="muted">{{t.submittedSub}}</p>
+      </div>
+      <div class="card">
+        <div class="kv"><span>{{t.service}}</span><b>{{svcName}}</b></div>
+        <div class="kv"><span>{{t.status}}</span><b>{{t.st0}}</b></div>
+      </div>
+      <div style="flex: 1"></div>
+      <button class="btn" onClick="{{openLast}}">{{t.track}}</button>
+      <button class="btn soft" onClick="{{goHome}}">{{t.backHome}}</button>
+    </sc-if>
+
+    <!-- TRACK -->
+    <sc-if value="{{is.track}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px">
+          <div><b style="font-size: 16px">{{cur.svcName}}</b><p class="muted">{{cur.no}} · {{cur.date}}</p></div>
+          <span class="{{cur.pillCls}}">{{cur.status}}</span>
+        </div>
+      </div>
+
+      <sc-if value="{{cur.needPay}}" hint-placeholder-val="{{ false }}">
+        <section class="alert">
+          <div class="ic" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2"></rect><path d="M3 10h18M7 15h3"></path></svg></div>
+          <div style="flex: 1">
+            <h3>{{t.payTitle}}</h3>
+            <p>{{t.payBody}}</p>
+            <button class="btn amber" style="height: 44px; width: auto" onClick="{{goPay}}">{{t.payNow}}</button>
+          </div>
+        </section>
+      </sc-if>
+
+      <sc-if value="{{cur.hasAppt}}" hint-placeholder-val="{{ false }}">
+        <button class="row-btn" onClick="{{goAppt}}">
+          <span class="ic" style="width: 40px; height: 40px; border-radius: 12px; background: #E8EEFB; color: #1D3F8F; display: grid; place-items: center" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></span>
+          <span class="grow"><b>{{t.apptOnsite}}</b><small>{{t.queueNo}} {{cur.queue}} · {{cur.apptDate}}</small></span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+        </button>
+      </sc-if>
+
+      <div class="card">
+        <h2 class="sec" style="margin: 0">{{t.progress}}</h2>
+        <div class="tl">
+          <sc-for list="{{cur.steps}}" as="s" hint-placeholder-count="6">
+            <div class="{{s.cls}}">
+              <div class="rail"><span class="dot">{{s.num}}</span><sc-if value="{{s.notLast}}" hint-placeholder-val="{{ true }}"><span class="bar"></span></sc-if></div>
+              <div class="txt"><b>{{s.label}}</b><small>{{s.sub}}</small></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <sc-if value="{{cur.canSim}}" hint-placeholder-val="{{ true }}">
+        <div class="demo"><span>{{t.demoNote}}</span><button class="linkbtn" onClick="{{simulate}}">{{t.demoBtn}}</button></div>
+      </sc-if>
+    </sc-if>
+
+    <!-- PAYMENT -->
+    <sc-if value="{{is.pay}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <div class="kv"><span>{{t.service}}</span><b>{{cur.svcName}}</b></div>
+        <div class="kv"><span>{{t.appNo}}</span><b>{{cur.no}}</b></div>
+        <div class="hr"></div>
+        <div class="kv"><span>{{t.fee}}</span><b>[FEE]</b></div>
+        <div class="kv"><span>{{t.serviceFee}}</span><b>[FEE]</b></div>
+        <div class="hr"></div>
+        <div class="kv" style="font-size: 16px"><span style="color: #0F172A; font-weight: 600">{{t.total}}</span><b>[TOTAL]</b></div>
+      </div>
+      <h2 class="sec">{{t.payMethod}}</h2>
+      <sc-for list="{{methods}}" as="m" hint-placeholder-count="3">
+        <label class="{{m.cls}}">
+          <input type="radio" name="pm" checked="{{m.on}}" onChange="{{m.pick}}">
+          <span class="grow"><b>{{m.name}}</b><small>{{m.sub}}</small></span>
+        </label>
+      </sc-for>
+      <sc-if value="{{payQr}}" hint-placeholder-val="{{ true }}">
+        <div class="qr" role="img" aria-label="KHQR payment code (placeholder)">
+          <svg width="150" height="150" viewBox="0 0 21 21" aria-hidden="true" shape-rendering="crispEdges"><rect width="21" height="21" fill="#fff"></rect><path fill="#0F172A" d="M0 0h7v7H0zM14 0h7v7h-7zM0 14h7v7H0z"></path><path fill="#fff" d="M1 1h5v5H1zM15 1h5v5h-5zM1 15h5v5H1z"></path><path fill="#0F172A" d="M2 2h3v3H2zM16 2h3v3h-3zM2 16h3v3H2zM8 0h1v2H8zM10 1h2v1h-2zM8 3h3v1H8zM12 3h1v3h-1zM9 5h2v2H9zM8 8h2v1H8zM0 8h2v1H0zM3 8h2v2H3zM11 8h3v1h-3zM15 8h2v2h-2zM18 8h3v1h-3zM1 10h2v2H1zM6 10h3v1H6zM10 10h1v3h-1zM12 10h2v2h-2zM17 11h2v2h-2zM20 10h1v3h-1zM4 12h2v2H4zM7 12h2v1H7zM14 13h2v1h-2zM8 14h2v2H8zM11 14h2v1h-2zM16 15h3v1h-3zM12 16h2v2h-2zM9 17h2v2H9zM15 17h1v4h-1zM17 18h3v1h-3zM11 19h3v1h-3zM19 20h2v1h-2z"></path></svg>
+        </div>
+        <p class="muted" style="text-align: center">{{t.qrNote}}</p>
+      </sc-if>
+      <button class="btn" onClick="{{confirmPay}}">{{payCta}}</button>
+    </sc-if>
+
+    <!-- PAYMENT DONE -->
+    <sc-if value="{{is.payDone}}" hint-placeholder-val="{{ false }}">
+      <div class="done">
+        <div class="big"><svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg></div>
+        <h2>{{payDoneTitle}}</h2>
+        <p class="muted">{{payDoneSub}}</p>
+      </div>
+      <div class="card">
+        <div class="kv"><span>{{t.appNo}}</span><b>{{cur.no}}</b></div>
+        <div class="kv"><span>{{t.payStatus}}</span><b>{{cur.payLabel}}</b></div>
+      </div>
+      <div style="flex: 1"></div>
+      <button class="btn" onClick="{{goAppt}}">{{t.viewAppt}}</button>
+      <button class="btn soft" onClick="{{backToTrack}}">{{t.track}}</button>
+    </sc-if>
+
+    <!-- APPOINTMENT -->
+    <sc-if value="{{is.appt}}" hint-placeholder-val="{{ false }}">
+      <div class="queue">
+        <small>{{t.queueNo}}</small>
+        <strong>{{cur.queue}}</strong>
+        <small>{{cur.apptDate}} · {{t.apptTime}}</small>
+      </div>
+      <div class="card">
+        <div class="kv"><span>{{t.office}}</span><b>[OFFICE NAME]</b></div>
+        <div class="kv"><span>{{t.payStatus}}</span><b>{{cur.payLabel}}</b></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin: 0">{{t.onsiteTitle}}</h2>
+        <div class="bio">
+          <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 11v4M8 8.5a5 5 0 0 1 8 0M6 12a6 6 0 0 1 12 0v2M9 15a3 3 0 0 0 6 0v-3"></path></svg>{{t.bioFinger}}</div>
+          <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>{{t.bioPhoto}}</div>
+          <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M8 7l4-4 4 4M8 17l4 4 4-4"></path></svg>{{t.bioHeight}}</div>
+          <div><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l2 2"></path></svg>{{t.bioMark}}</div>
+        </div>
+        <h2 class="sec" style="margin: 0">{{t.bring}}</h2>
+        <p class="muted">{{t.bringList}}</p>
+      </div>
+      <div style="display: flex; gap: 8px">
+        <button class="btn soft">{{t.addCal}}</button>
+        <button class="btn soft">{{t.directions}}</button>
+      </div>
+    </sc-if>
+
+    <!-- INFO -->
+    <sc-if value="{{is.info}}" hint-placeholder-val="{{ false }}">
+      <div class="card">
+        <h2 class="sec" style="margin: 0">{{t.hours}}</h2>
+        <div class="kv"><span>{{t.monFri}}</span><b>[08:00 – 17:00]</b></div>
+        <div class="kv"><span>{{t.lunch}}</span><b>[12:00 – 14:00]</b></div>
+        <div class="kv"><span>{{t.weekend}}</span><b>{{t.closed}}</b></div>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin: 0">{{t.nearest}}</h2>
+        <div class="off"><span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span><span class="grow"><b>[OFFICE NAME 1]</b><small>[DISTANCE] · {{t.openNow}}</small></span></div>
+        <div class="off"><span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.3-7-11a7 7 0 0 1 14 0c0 4.7-7 11-7 11z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></span><span class="grow"><b>[OFFICE NAME 2]</b><small>[DISTANCE] · {{t.openNow}}</small></span></div>
+      </div>
+      <div class="card" style="gap: 0">
+        <h2 class="sec" style="margin: 0 0 4px">{{t.faq}}</h2>
+        <sc-for list="{{faqs}}" as="q" hint-placeholder-count="4">
+          <div class="faq">
+            <button onClick="{{q.toggle}}" aria-expanded="{{q.open}}"><span>{{q.q}}</span><span aria-hidden="true">{{q.sign}}</span></button>
+            <sc-if value="{{q.open}}" hint-placeholder-val="{{ false }}"><p>{{q.a}}</p></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div class="card">
+        <h2 class="sec" style="margin: 0">{{t.contact}}</h2>
+        <div class="ct"><span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></span><span>{{t.hotline}}: [PHONE]</span></div>
+        <div class="ct"><span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"></rect><path d="M3 7l9 6 9-6"></path></svg></span><span>{{t.email}}: [EMAIL]</span></div>
+        <div class="ct"><span class="ic" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4L3 11l6 2 2 6 3-4 5 4z"></path></svg></span><span>Telegram: [CHANNEL]</span></div>
+      </div>
+      <button class="btn soft" onClick="{{goAssistant}}">{{t.askAi}}</button>
+    </sc-if>
+
+    <!-- ASSISTANT -->
+    <sc-if value="{{is.assistant}}" hint-placeholder-val="{{ false }}">
+      <div class="chat" aria-live="polite">
+        <sc-for list="{{chat}}" as="c" hint-placeholder-count="2">
+          <div class="{{c.cls}}">{{c.text}}</div>
+        </sc-for>
+      </div>
+      <div style="flex: 1"></div>
+      <p class="muted">{{t.suggested}}</p>
+      <div class="chips">
+        <sc-for list="{{chips}}" as="c" hint-placeholder-count="3">
+          <button onClick="{{c.ask}}">{{c.q}}</button>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <!-- ALERTS -->
+    <sc-if value="{{is.alerts}}" hint-placeholder-val="{{ false }}">
+      <sc-for list="{{notifs}}" as="n" hint-placeholder-count="3">
+        <div class="ntf">
+          <span class="{{n.icCls}}" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"></path></svg></span>
+          <div><b>{{n.title}}</b><p>{{n.body}}</p><small>{{n.when}}</small></div>
+        </div>
+      </sc-for>
+    </sc-if>
+
+  </main>
+
+  <sc-if value="{{showNav}}" hint-placeholder-val="{{ true }}">
+    <nav class="nav" aria-label="Main">
+      <button class="{{nav.home}}" onClick="{{goHome}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></svg>{{t.navHome}}</button>
+      <button class="{{nav.apps}}" onClick="{{goApps}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"></path><path d="M14 3v5h5M9 13h6M9 17h4"></path></svg>{{t.navApps}}</button>
+      <button class="{{nav.info}}" onClick="{{goInfo}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>{{t.navInfo}}</button>
+      <button class="{{nav.alerts}}" onClick="{{goAlerts}}"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10 21h4"></path></svg>{{t.navAlerts}}<span class="badge">{{notifCount}}</span></button>
+    </nav>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"startLanguage":{"editor":"enum","options":["km","en"],"default":"km"},"showExpiryAlert":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}' src="./Main.dc.js"></script>
+</body>
+</html>
