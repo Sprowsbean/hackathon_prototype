@@ -1,4 +1,4 @@
-# Atta – ID & Passport App Prototype (Khmer / English)
+# KH-ID – ID & Passport App Prototype (Khmer / English)
 
 A clickable mobile prototype with two apps that share the same demo data:
 
@@ -21,10 +21,21 @@ Open `project/both.html` to see both apps side by side. Officer actions show up 
 | 1 Submitted | Application received | Opens it (moves to Under review automatically) |
 | 2 Under review | Officer is checking | Verifies every field against the documents. Low-confidence OCR fields are listed first. Wrong values are edited directly; the citizen does not need to resubmit. |
 | 3 Verified & accepted | Gets a **QR code** (full name + application no.), valid for **1 week** | Accept & issue QR |
-| 4 On-site: fingerprint & photo | Comes on-site within 1 week | **Scans the QR code** (expired codes are rejected and can be reissued), checks the citizen in with a queue number, then clicks **Update biometrics** |
+| 4 On-site: fingerprint & photo | Comes on-site within 1 week | **Scans the QR code** (expired codes are rejected; officers cannot reissue them), checks the citizen in with a queue number, then clicks **Update biometrics** |
 | 5 Payment | Pays online (KHQR / card) or chooses cash | Online payments update automatically; cash is marked by the officer |
 | 6 In progress | Document is being printed | Move to In progress |
-| 7 Ready for pickup | Pick up within 1 week after the notice | Done – ready for pickup |
+| 7 Ready for pickup | Can pick up now at AEON MALL 2, same floor as the GDI office (no deadline). Shows a separate **pickup QR code** | Done – ready for pickup, then **scans the pickup QR** and confirms handover |
+
+## Officer app notes
+
+- **Review Application** shows the uploaded documents next to the form. On phones the document viewer stays pinned above the form (zoom, switch tabs, hide); on wide screens (tablet/desktop, 760px+) it is a true two-column layout. The sample images are `project/doc-birth-certificate.jpg` and `project/doc-family-book.jpg`; birth documents show the first and family/residence documents show the second.
+- **Expired QR:** officers have no reissue button. The citizen renews it in the citizen app by paying the late fee ($1 per started day). The fee goes to the KH-ID app, not GDI, and the new QR is issued automatically (see `qrRenewalFee` on the application and the late-fee total on the Payments screen).
+- **Pickup QR:** a second QR (`pickupQrText` in `shared.js`) with no expiry. The officer scans it from the Scan screen and taps **Confirm handover** (`pickedUpAt`).
+- **Log out** is the last button in the footer, same as the citizen app.
+
+## Fees
+
+ID card: free. Passport (standard processing, about 15 working days): $100 for age 6 and above (10-year validity), $80 under 6 (5-year validity). The age comes from the date of birth in the application form (`feeFor` in `project/shared.js`, measured on the submission date). The price is shown on the citizen's track card and payment screen before paying and on the officer's Payments list. Free ID applications skip payment and go straight to Paid after biometrics. Confirm the amounts with GDI before presenting.
 
 ## Required documents (shown in the app)
 
@@ -73,7 +84,7 @@ docker run --rm -p 8080:80 id-passport-demo:latest
 
 ## Placeholders to fill in
 
-Search for `[` to find them: `[FEE]`, `[TOTAL]`, `[PHONE]`, `[EMAIL]`, `[CHANNEL]`, `[FACEBOOK PAGE]`, `[WEBSITE]`, `[DISTANCE]` and the working hours. No official hotline or email was found online, so the contact details are still placeholders.
+Search for `[` to find remaining placeholders: `[FEE]`, `[TOTAL]`, `[DISTANCE]` and the working hours. The citizen app's Information page includes the GDI phone, email, Telegram and Facebook contacts.
 
 ## Notes
 

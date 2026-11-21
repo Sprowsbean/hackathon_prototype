@@ -2,16 +2,16 @@ body{margin:0}
 a{color:#1D3F8F}a:hover{color:#142C66}
 .app{width:390px;height:844px;display:flex;flex-direction:column;background:#F4F6FA;font-family:'Kantumruy Pro',system-ui,sans-serif;color:#0F172A;overflow:hidden;line-height:1.5;box-sizing:border-box}
 .app *{box-sizing:border-box}
-.top{height:64px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#fff;border-bottom:1px solid #E5E7EB}
+.top{height:64px;flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;background:#0F1F4D;color:#fff}
 .top-title{flex:1;margin:0;font-size:17px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25}
 .logo{width:36px;height:36px;display:block;flex:none}.logo svg{display:block}
-.top.bare{background:transparent;border-bottom:0;justify-content:flex-end}
-.top-title small{display:block;font-size:11px;font-weight:500;color:#64748B;line-height:1.2}
-.icon-btn{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;color:#0F172A;cursor:pointer;margin-left:-10px;flex:none}
-.icon-btn:hover{background:#F1F5F9}
-.lang{display:flex;background:#EEF2F7;border-radius:999px;padding:3px;flex:none}
-.lang button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;padding:0 10px;height:34px;min-width:44px;border-radius:999px;color:#475569;cursor:pointer}
-.lang button.on{background:#1D3F8F;color:#fff}
+.top.bare{background:#0F1F4D;justify-content:flex-end}
+.top-title small{display:block;font-size:11px;font-weight:500;color:#C7D2FE;line-height:1.2}
+.icon-btn{width:44px;height:44px;border:0;background:transparent;border-radius:12px;display:grid;place-items:center;color:#fff;cursor:pointer;margin-left:-10px;flex:none}
+.icon-btn:hover{background:rgba(255,255,255,.1)}
+.lang{display:flex;background:rgba(255,255,255,.12);border-radius:999px;padding:3px;flex:none}
+.lang button{border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;padding:0 10px;height:34px;min-width:44px;border-radius:999px;color:#E0E7FF;cursor:pointer}
+.lang button.on{background:#fff;color:#0F1F4D}
 .body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:16px}
 .card{background:#fff;border-radius:16px;padding:16px;border:1px solid #E5E7EB;display:flex;flex-direction:column;gap:12px}
 h2.sec{font-size:15px;font-weight:600;margin:4px 0 0}
@@ -23,7 +23,7 @@ h2.sec{font-size:15px;font-weight:600;margin:4px 0 0}
 .btn.soft:hover{background:#DCE5F8}
 .btn.amber{background:#B45309}
 .linkbtn{border:0;background:transparent;font:inherit;font-size:13px;color:#1D3F8F;font-weight:600;cursor:pointer;min-height:44px;padding:0 4px;text-decoration:underline}
-.nav{height:72px;flex:none;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));background:#fff;border-top:1px solid #E5E7EB}
+.nav{height:72px;flex:none;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));background:#fff;border-top:1px solid #E5E7EB}
 .nav button{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font:inherit;font-size:12px;color:#64748B;cursor:pointer;position:relative}
 .nav button.on{color:#1D3F8F;font-weight:600}
 .badge{position:absolute;top:10px;left:calc(50% + 6px);background:#B91C1C;color:#fff;font-size:10px;font-weight:700;min-width:16px;height:16px;border-radius:8px;display:grid;place-items:center;padding:0 4px}
@@ -69,6 +69,18 @@ h2.sec{font-size:15px;font-weight:600;margin:4px 0 0}
 .idmock .ph{width:64px;height:80px;border-radius:6px;background:#CBD5E1}
 .idmock .ln{display:flex;flex-direction:column;gap:9px;flex:1;padding-top:4px}
 .idmock .ln i{display:block;height:8px;border-radius:4px;background:#CBD5E1}
+.document-copy{display:block;width:100%;height:auto;border-radius:10px;border:1px solid #CBD5E1;background:#fff}
+.print-document-btn{margin-top:2px}
+@media print{
+  @page{size:A4 portrait;margin:12mm}
+  body{background:#fff!important}
+  .app{width:auto;height:auto;overflow:visible;background:#fff!important}
+  .top,.nav,.kv,.muted,.print-document-btn,.document-print-screen h2.sec{display:none!important}
+  .body{overflow:visible;padding:0}
+  .body > .card:not(.document-print-screen){display:none!important}
+  .document-print-screen{border:0;padding:0;box-shadow:none;gap:0}
+  .document-copy{width:186mm;max-width:100%;max-height:273mm;border:1px solid #94A3B8;border-radius:3mm;object-fit:contain}
+}
 .beam{position:absolute;left:0;right:0;height:3px;background:#60A5FA;box-shadow:0 0 18px 6px rgba(96,165,250,.55);animation:beam 1.6s ease-in-out infinite}
 @keyframes beam{0%{top:12%}50%{top:86%}100%{top:12%}}
 .field{display:flex;flex-direction:column;gap:6px}
@@ -195,3 +207,26 @@ a.ct:hover b{color:#1D3F8F;text-decoration:underline}
 .req b{font-size:13px;font-weight:600}
 .req ul{margin:4px 0 0;padding-left:18px;font-size:13px;color:#334155}
 .req li{margin:2px 0}
+.optional-label{color:#64748B;font-size:11px;font-weight:600}
+.passport-age-note{margin-top:-6px}
+.logo img{width:36px;height:36px;display:block;border-radius:10px;object-fit:contain}
+.top{box-shadow:0 1px 12px rgba(15,23,42,.04)}
+.top-title{color:#fff}
+.body{background:
+  radial-gradient(circle at 100% 0,rgba(29,63,143,.055),transparent 180px),
+  #F4F6FA}
+.card{box-shadow:0 6px 18px rgba(15,23,42,.055)}
+.hero{padding:10px 0 6px}
+.hero .auth-logo{border-radius:20px;box-shadow:0 12px 28px rgba(29,63,143,.22)}
+.hero .brand{color:#0F1F4D}
+.hero p{color:#64748B}
+.seg{box-shadow:inset 0 0 0 1px rgba(148,163,184,.12)}
+.auth-card{margin-top:2px;padding:18px;border-radius:18px}
+.auth-card .sec{font-size:17px}
+.field input{height:48px}
+.btn{box-shadow:0 8px 16px rgba(29,63,143,.12)}
+.btn.soft,.btn:disabled{box-shadow:none}
+.hello{background:linear-gradient(135deg,#1D3F8F 0%,#274FA8 100%);box-shadow:0 10px 24px rgba(29,63,143,.16)}
+.svc{box-shadow:0 4px 12px rgba(15,23,42,.035);transition:border-color .15s,transform .15s,box-shadow .15s}
+.svc:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(15,23,42,.08)}
+.nav{box-shadow:0 -4px 16px rgba(15,23,42,.04)}

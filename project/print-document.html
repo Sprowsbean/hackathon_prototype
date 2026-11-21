@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>KH-ID document print</title>
+  <style>
+    * { box-sizing: border-box }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; padding: 24px; background: #f1f5f9; color: #0f172a; font: 16px/1.5 system-ui, sans-serif }
+    main { width: min(100%, 760px); padding: 24px; display: grid; justify-items: center; gap: 16px; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff }
+    h1 { margin: 0; font-size: 20px; text-align: center }
+    img { display: block; width: auto; height: auto; max-width: 100%; max-height: 273mm; object-fit: contain }
+    .actions { display: grid; justify-items: center; gap: 8px; width: 100% }
+    button { min-height: 48px; padding: 0 20px; border: 0; border-radius: 10px; background: #1d3f8f; color: #fff; font: inherit; font-weight: 600; cursor: pointer }
+    button:hover { background: #142c66 }
+    p { margin: 0; color: #475569; font-size: 14px; text-align: center }
+    .error { color: #991b1b }
+    @page { size: A4 portrait; margin: 12mm }
+    @media print {
+      body { display: block; min-height: 0; padding: 0; background: #fff }
+      main { width: 100%; padding: 0; border: 0; border-radius: 0 }
+      h1, .actions { display: none }
+      img { max-width: 186mm; max-height: 273mm }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1 id="title"></h1>
+    <img id="document" alt="">
+    <div class="actions">
+      <button id="print" type="button">Print / Save as PDF on A4</button>
+      <p>Use your browser's print dialog. Shortcut: Cmd+P on Mac or Ctrl+P on Windows.</p>
+      <p id="status" role="status"></p>
+    </div>
+  </main>
+  <script>
+    (function () {
+      var documents = {
+        id: { title: 'Prototype identity card', image: './id-card-copy.png', alt: 'Cambodia khmer identity card prototype' },
+        passport: { title: 'Prototype passport', image: './passport-copy.png', alt: 'Cambodia passport prototype' }
+      };
+      var selected = documents[new URLSearchParams(window.location.search).get('type')];
+      var title = document.getElementById('title');
+      var image = document.getElementById('document');
+      var button = document.getElementById('print');
+      var status = document.getElementById('status');
+
+      if (!selected) {
+        title.textContent = 'Document not found';
+        image.hidden = true;
+        button.hidden = true;
+        status.className = 'error';
+        status.textContent = 'Return to the app and choose an ID or passport again.';
+        return;
+      }
+
+      document.title = selected.title + ' · KH-ID';
+      title.textContent = selected.title;
+      image.alt = selected.alt;
+      image.addEventListener('error', function () {
+        status.className = 'error';
+        status.textContent = 'The document image could not be loaded. Return to the app and try again.';
+      }, { once: true });
+      image.src = selected.image;
+      button.addEventListener('click', function () { window.print(); });
+    })();
+  </script>
+</body>
+</html>
