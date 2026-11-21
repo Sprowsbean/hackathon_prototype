@@ -1,180 +1,399 @@
+var S = window.AttaStore;
 var T = {
   en: {
-    back:'Back', officerName:'Officer · [OFFICE NAME]',
-    t_dash:'Dashboard', t_queue:'Applications', t_detail:'Application', t_schedule:'Accept & schedule', t_payments:'Payments',
-    k_pending:'Pending review', k_new:'New applications', k_renew:'Renewals', k_unpaid:'Awaiting payment', k_paid:'Paid',
-    byService:'Applications by service', byStage:'Applications by status', lostDamagedAnalytics:'Lost and damaged ID analytics', lostIds:'Lost ID requests', damagedIds:'Damaged ID requests', lostDamagedNote:'Counts are based on submitted ID-renewal requests and their selected reason.', reviewPending:'Review pending applications',
-    sampleNote:'Figures are counted from the sample applications in this prototype.',
+    back:'Back', oTagline:'Officer portal · ID card and passport services', logIn:'Log in', signUp:'Sign up',
+    loginTitle:'Officer log in', loginSub:'Use your officer ID and password.', signupTitle:'Create an officer account', signupSub:'A supervisor approves new accounts. In this demo they are approved right away.',
+    officerId:'Officer ID', password:'Password', fullName:'Full name', workplace:'Workplace', phone:'Phone number', demoCreds:'Demo account: OF-1024 / 1234',
+    loginErr:'Officer ID or password is wrong.', needFields:'Please fill in all fields.', idTaken:'This officer ID is already registered.', createAcc:'Create account', logOut:'Log out',
+    noAccount:'No account yet?', haveAccount:'Already registered?',
+    off0:'AEON Mall Sen Sok City (AEON 2)', off1:'Toul Kork District Police Inspectorate',
+    t_dash:'Dashboard', t_queue:'Applications', t_detail:'Review application', t_issue:'Accept & issue QR', t_scan:'Scan QR code', t_payments:'Payments',
+    k_pending:'Pending review', k_new:'New applications', k_renew:'Renewals', k_unpaid:'Awaiting payment', k_lost:'Lost', k_damaged:'Damaged', kId:'ID', kPass:'Passport',
+    pipeline:'Application pipeline', pipelineSub:'Applications at each step right now', svcMix:'Applications by service', week:'Submitted in the last 7 days', today:'Today', total:'Total',
+    reviewPending:'Review pending applications', scanQr:'Scan a QR code', sampleNote:'Figures are counted from the sample applications in this prototype.',
     search:'Search name or application no.', empty:'No applications here.',
-    f_all:'All', f_pending:'Pending', f_verified:'Awaiting payment', f_onsite:'On-site', f_ready:'Ready',
+    f_all:'All', f_pending:'Pending', f_accepted:'QR issued', f_onsite:'Biometrics & payment', f_progress:'In progress', f_ready:'Ready',
     svc_newId:'New ID card', svc_renewId:'ID card renewal', svc_newPass:'New passport', svc_renewPass:'Passport renewal',
-    sh0:'New', sh1:'Reviewing', sh2:'Unpaid', sh3:'On-site', sh4:'Printing', sh5:'Ready',
-    st0:'Submitted', st1:'Under review', st2:'Verified – awaiting payment', st3:'Paid – waiting for biometrics', st4:'Biometrics captured', st5:'Ready for pickup',
-    appNo:'Application no.', service:'Service', submittedOn:'Submitted', dob:'Date of birth', pob:'Place of birth', pnh:'Phnom Penh', payment:'Payment', queueNo:'Queue no.',
-    paidOnline:'Paid online', payAtOffice:'Cash at office (unpaid)', paidCash:'Paid in cash', unpaid:'Not paid',
-    uploadedDocs:'Uploaded documents', autoChecks:'Automatic checks (OCR)',
-    c1:'Name matches across documents', c1s:'Birth certificate, family book', c2:'Date of birth matches', c2s:'All documents agree',
-    c3:"Mother's name – low OCR confidence", c3s:'Compare with the family book before verifying',
-    c3ok:"Mother's name confirmed by officer", c3oks:'Checked against the family book', c4:'No duplicate application found', c4s:'Checked against active applications',
-    startReview:'Start review', verifyAccept:'Verify & accept', requestFix:'Ask citizen to correct',
-    awaitPay:'The citizen has been asked to pay. Online payments update automatically. Mark cash payments here.', markCash:'Mark cash received',
-    onsite:'On-site capture', bio1:'Fingerprints scanned', bio2:'Photo taken', bio3:'Height measured', bio4:'Special features recorded', markBio:'Save biometrics',
-    markReady:'Mark ready for pickup', allDone:'Complete. The citizen has been notified to collect the document.',
-    applicant:'Applicant', pickDate:'On-site date', pickTime:'Time slot', autoQueue:'Queue number (auto)',
-    notifyNote:'The citizen gets a notification with the date, time, queue number and the payment request.',
-    confirmNotify:'Confirm & notify citizen',
-    toastAccept:'Accepted. Citizen notified with queue no. ', toastFix:'Correction request sent to the citizen.', toastCash:'Payment recorded. Status updated.', toastBio:'Biometrics saved. Status updated.', toastReady:'Marked ready. Citizen notified.', toastReview:'Moved to “Under review”.',
-    navDash:'Dashboard', navQueue:'Applications', navPay:'Payments',
-    d_birth:'Birth certificate', d_family:'Family book', d_res:'Residence book', d_id:'National ID', d_oldId:'Current ID', d_oldPass:'Current passport', view:'View',
-    mon:'Mon', tue:'Tue', wed:'Wed', thu:'Thu'
+    r_expired:'Expired', r_lost:'Lost', r_damaged:'Damaged',
+    cp0:'New', cp1:'Review', cp2:'QR sent', cp3:'Unpaid', cp4:'Paid', cp5:'Printing', cp6:'Ready',
+    sh0:'New', sh1:'Reviewing', sh2:'QR issued', sh3:'Unpaid', sh4:'Paid', sh5:'In progress', sh6:'Ready',
+    st0:'Submitted', st1:'Under review', st2:'Accepted – QR issued', st3:'Biometrics done – awaiting payment', st4:'Paid', st5:'In progress', st6:'Ready for pickup',
+    appNo:'Application no.', service:'Service', reason:'Reason', submittedOn:'Submitted', payment:'Payment', queueNo:'Queue no.', stepOf:'Step', of:'of',
+    paidOnline:'Paid online (automatic)', payAtOffice:'Cash at counter (not paid yet)', paidCash:'Paid in cash', unpaid:'Not paid',
+    reviewTitle:'Check each field against the documents', verifiedOf:'verified', verifyAllOk:'Verify all matched fields',
+    flagged:'Low OCR confidence – check carefully', from:'From', edit:'Edit', save:'Save', cancel:'Cancel', verify:'Verify', verified:'Verified',
+    editedBy:'Edited by officer · was', editNote:'If something is wrong, correct it here. The citizen does not need to resubmit.',
+    uploadedDocs:'Uploaded documents', tapToView:'Tap a document to compare it with the form', fieldsFromDoc:'Fields read from this document', close:'Close', docDemo:'Document preview (demo)',
+    autoChecks:'Automatic checks', c1:'Name matches across documents', c2:'Date of birth matches', c4:'No duplicate application found',
+    evidence_lost:'Police certificate of loss attached', evidence_damaged:'Photo of the damaged document attached. Collect the damaged card on-site.',
+    acceptQr:'Accept & issue QR code', acceptHint:'Verify every field to accept.',
+    applicant:'Applicant', qrPreview:'QR code the citizen receives', qrContains:'Contains the full name and application number', validFor:'Valid for 1 week, until',
+    issueNote:'The citizen is notified and must come on-site within 1 week. The queue number is given when you scan the QR code on-site.', confirmNotify:'Confirm & notify citizen',
+    qrIssued:'QR code issued', waitVisit:'Waiting for the citizen to come on-site.', daysLeft:'days left', validUntil:'Valid until',
+    qrExpired:'QR code expired on', reissue:'Reissue QR code (valid 1 week)', scanBtn:'Scan citizen’s QR code',
+    onsite:'On-site biometrics', checkedInQ:'Checked in · queue no.', bio1:'Fingerprints scanned', bio2:'Photo taken', bio3:'Height measured', bio4:'Special features recorded', updateBio:'Update biometrics',
+    payTitle:'Payment', waitOnline:'Waiting for payment. Online payments (KHQR / card) update automatically.', cashChosen:'The citizen will pay cash at the counter.', markCash:'Mark cash received',
+    paidNote:'Payment confirmed', toProgress:'Move to In progress', progressNote:'The document is being printed.', markDone:'Done – ready for pickup',
+    allDone:'Complete. The citizen was notified to pick up by', details:'Application details',
+    f_nameKm:'Name (Khmer)', f_nameEn:'Name (Latin)', f_dob:'Date of birth', f_sex:'Sex', f_pob:'Place of birth', f_addr:'Current address', f_father:"Father's name", f_mother:"Mother's name",
+    scanTitle:'Scan the citizen’s QR code', scanSub:'Point the camera at the QR code on the citizen’s phone.', scanning:'Reading QR code…',
+    demoPick:'Demo: choose the QR code in front of the camera', noWaiting:'No citizens are waiting with a QR code.', manual:'Or enter the application number', find:'Find',
+    resValid:'QR code valid', resExpired:'QR code expired', resExpiredSub:'QR codes are valid for 1 week only. This one expired on', resNotFound:'No application found for this code.',
+    resWrongStage:'This application is not waiting for an on-site visit.', resChecked:'Already checked in', checkIn:'Check in & assign queue no.', openApp:'Open application', scanAgain:'Scan another',
+    k_paidOnline:'Paid online', k_paidCash:'Paid in cash', payAuto:'Online payments update automatically. Mark cash payments when the citizen pays at the counter.',
+    toastReview:'Moved to “Under review”.', toastAccept:'Accepted. QR code sent to the citizen.', toastReissue:'New QR code sent (valid 1 week).', toastCheckIn:'Checked in. Queue no. ',
+    toastBio:'Biometrics updated. Waiting for payment.', toastCash:'Cash payment recorded.', toastProgress:'Moved to In progress.', toastDone:'Done. Citizen notified to pick up within 1 week.',
+    toastSaved:'Field corrected and verified.', toastWelcome:'Welcome, ',
+    navDash:'Dashboard', navQueue:'Applications', navScan:'Scan', navPay:'Payments',
+    d_birth:'Birth certificate', d_family:'Family book', d_familyOrRes:'Family / residence book', d_id:'National ID', d_oldId:'Current ID', d_oldPass:'Current passport',
+    d_policeLoss:'Police certificate of loss', d_damagedId:'Damaged ID (photo)', d_damagedPass:'Damaged passport (photo)', d_oldPassCopy:'Old passport copy', view:'View'
   },
   km: {
-    back:'ត្រឡប់ក្រោយ', officerName:'មន្ត្រី · [ឈ្មោះការិយាល័យ]',
-    t_dash:'ផ្ទាំងគ្រប់គ្រង', t_queue:'ពាក្យស្នើសុំ', t_detail:'ពាក្យសុំ', t_schedule:'ទទួលយក និងកំណត់ពេល', t_payments:'ការបង់ប្រាក់',
-    k_pending:'រង់ចាំការពិនិត្យ', k_new:'ពាក្យសុំធ្វើថ្មី', k_renew:'ពាក្យសុំបន្ត', k_unpaid:'រង់ចាំការបង់ប្រាក់', k_paid:'បានបង់',
-    byService:'ពាក្យសុំតាមប្រភេទសេវា', byStage:'ពាក្យសុំតាមស្ថានភាព', reviewPending:'ពិនិត្យពាក្យសុំដែលកំពុងរង់ចាំ',
-    sampleNote:'តួលេខត្រូវបានរាប់ពីពាក្យសុំគំរូក្នុងគំរូសាកល្បងនេះ។',
+    back:'ត្រឡប់ក្រោយ', oTagline:'ផតថលមន្ត្រី · សេវាអត្តសញ្ញាណប័ណ្ណ និងលិខិតឆ្លងដែន', logIn:'ចូល', signUp:'ចុះឈ្មោះ',
+    loginTitle:'ការចូលសម្រាប់មន្ត្រី', loginSub:'ប្រើលេខសម្គាល់មន្ត្រី និងពាក្យសម្ងាត់របស់អ្នក។', signupTitle:'បង្កើតគណនីមន្ត្រី', signupSub:'ប្រធានអនុម័តគណនីថ្មី។ ក្នុងការសាកល្បងនេះ គណនីត្រូវបានអនុម័តភ្លាមៗ។',
+    officerId:'លេខសម្គាល់មន្ត្រី', password:'ពាក្យសម្ងាត់', fullName:'ឈ្មោះពេញ', workplace:'កន្លែងធ្វើការ', phone:'លេខទូរស័ព្ទ', demoCreds:'គណនីសាកល្បង៖ OF-1024 / 1234',
+    loginErr:'លេខសម្គាល់ ឬពាក្យសម្ងាត់មិនត្រឹមត្រូវ។', needFields:'សូមបំពេញព័ត៌មានទាំងអស់។', idTaken:'លេខសម្គាល់នេះត្រូវបានចុះឈ្មោះរួចហើយ។', createAcc:'បង្កើតគណនី', logOut:'ចាកចេញ',
+    noAccount:'មិនទាន់មានគណនី?', haveAccount:'បានចុះឈ្មោះរួចហើយ?',
+    off0:'ផ្សារទំនើបអ៊ីអុន សែនសុខស៊ីធី (អ៊ីអុន ២)', off1:'អធិការដ្ឋាននគរបាលខណ្ឌទួលគោក',
+    t_dash:'ផ្ទាំងគ្រប់គ្រង', t_queue:'ពាក្យស្នើសុំ', t_detail:'ពិនិត្យពាក្យសុំ', t_issue:'ទទួលយក និងចេញកូដ QR', t_scan:'ស្កេនកូដ QR', t_payments:'ការបង់ប្រាក់',
+    k_pending:'រង់ចាំការពិនិត្យ', k_new:'ពាក្យសុំធ្វើថ្មី', k_renew:'ពាក្យសុំបន្ត', k_unpaid:'រង់ចាំការបង់ប្រាក់', k_lost:'បាត់', k_damaged:'ខូច', kId:'អត្តសញ្ញាណប័ណ្ណ', kPass:'លិខិតឆ្លងដែន',
+    pipeline:'លំហូរពាក្យសុំ', pipelineSub:'ចំនួនពាក្យសុំនៅជំហាននីមួយៗ ពេលនេះ', svcMix:'ពាក្យសុំតាមប្រភេទសេវា', week:'ពាក្យសុំដែលបានដាក់ក្នុង ៧ ថ្ងៃចុងក្រោយ', today:'ថ្ងៃនេះ', total:'សរុប',
+    reviewPending:'ពិនិត្យពាក្យសុំដែលកំពុងរង់ចាំ', scanQr:'ស្កេនកូដ QR', sampleNote:'តួលេខត្រូវបានរាប់ពីពាក្យសុំគំរូក្នុងគំរូសាកល្បងនេះ។',
     search:'ស្វែងរកឈ្មោះ ឬលេខពាក្យសុំ', empty:'មិនមានពាក្យសុំនៅទីនេះទេ។',
-    f_all:'ទាំងអស់', f_pending:'រង់ចាំ', f_verified:'រង់ចាំបង់ប្រាក់', f_onsite:'នៅការិយាល័យ', f_ready:'រួចរាល់',
+    f_all:'ទាំងអស់', f_pending:'រង់ចាំ', f_accepted:'បានចេញ QR', f_onsite:'ជីវមាត្រ និងបង់ប្រាក់', f_progress:'កំពុងដំណើរការ', f_ready:'រួចរាល់',
     svc_newId:'ធ្វើអត្តសញ្ញាណប័ណ្ណថ្មី', svc_renewId:'បន្តអត្តសញ្ញាណប័ណ្ណ', svc_newPass:'ធ្វើលិខិតឆ្លងដែនថ្មី', svc_renewPass:'បន្តលិខិតឆ្លងដែន',
-    sh0:'ថ្មី', sh1:'កំពុងពិនិត្យ', sh2:'មិនទាន់បង់', sh3:'នៅការិយាល័យ', sh4:'កំពុងបោះពុម្ព', sh5:'រួចរាល់',
-    st0:'បានដាក់ស្នើ', st1:'កំពុងពិនិត្យ', st2:'បានផ្ទៀងផ្ទាត់ – រង់ចាំការបង់ប្រាក់', st3:'បានបង់ – រង់ចាំថតជីវមាត្រ', st4:'បានថតជីវមាត្រ', st5:'រួចរាល់សម្រាប់ទទួល',
-    appNo:'លេខពាក្យសុំ', service:'សេវាកម្ម', submittedOn:'ថ្ងៃដាក់ស្នើ', dob:'ថ្ងៃខែឆ្នាំកំណើត', pob:'ទីកន្លែងកំណើត', pnh:'ភ្នំពេញ', payment:'ការបង់ប្រាក់', queueNo:'លេខរង់ចាំ',
-    paidOnline:'បានបង់តាមអនឡាញ', payAtOffice:'សាច់ប្រាក់នៅការិយាល័យ (មិនទាន់បង់)', paidCash:'បានបង់ជាសាច់ប្រាក់', unpaid:'មិនទាន់បង់',
-    uploadedDocs:'ឯកសារដែលបានបញ្ចូល', autoChecks:'ការត្រួតពិនិត្យស្វ័យប្រវត្តិ (OCR)',
-    c1:'ឈ្មោះដូចគ្នាក្នុងឯកសារទាំងអស់', c1s:'សំបុត្រកំណើត សៀវភៅគ្រួសារ', c2:'ថ្ងៃខែឆ្នាំកំណើតត្រូវគ្នា', c2s:'ឯកសារទាំងអស់ស្របគ្នា',
-    c3:'ឈ្មោះម្ដាយ – OCR មិនសូវច្បាស់', c3s:'សូមផ្ទៀងជាមួយសៀវភៅគ្រួសារ មុនពេលផ្ទៀងផ្ទាត់',
-    c3ok:'ឈ្មោះម្ដាយត្រូវបានបញ្ជាក់ដោយមន្ត្រី', c3oks:'បានផ្ទៀងជាមួយសៀវភៅគ្រួសារ', c4:'រកមិនឃើញពាក្យសុំស្ទួន', c4s:'បានពិនិត្យជាមួយពាក្យសុំសកម្ម',
-    startReview:'ចាប់ផ្ដើមពិនិត្យ', verifyAccept:'ផ្ទៀងផ្ទាត់ និងទទួលយក', requestFix:'ស្នើឱ្យពលរដ្ឋកែតម្រូវ',
-    awaitPay:'ពលរដ្ឋត្រូវបានស្នើឱ្យបង់ប្រាក់។ ការបង់តាមអនឡាញនឹងធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ។ កត់ត្រាការបង់ជាសាច់ប្រាក់នៅទីនេះ។', markCash:'កត់ត្រាថាបានទទួលសាច់ប្រាក់',
-    onsite:'ការថតនៅការិយាល័យ', bio1:'បានស្កេនស្នាមម្រាមដៃ', bio2:'បានថតរូប', bio3:'បានវាស់កម្ពស់', bio4:'បានកត់ត្រាសញ្ញាសម្គាល់ពិសេស', markBio:'រក្សាទុកជីវមាត្រ',
-    markReady:'កំណត់ថារួចរាល់សម្រាប់ទទួល', allDone:'បានបញ្ចប់។ ពលរដ្ឋត្រូវបានជូនដំណឹងឱ្យមកទទួលឯកសារ។',
-    applicant:'អ្នកស្នើសុំ', pickDate:'ថ្ងៃមកការិយាល័យ', pickTime:'ម៉ោង', autoQueue:'លេខរង់ចាំ (ស្វ័យប្រវត្តិ)',
-    notifyNote:'ពលរដ្ឋនឹងទទួលបានការជូនដំណឹង រួមមានថ្ងៃ ម៉ោង លេខរង់ចាំ និងការស្នើសុំបង់ប្រាក់។',
-    confirmNotify:'បញ្ជាក់ និងជូនដំណឹងពលរដ្ឋ',
-    toastAccept:'បានទទួលយក។ បានជូនដំណឹងពលរដ្ឋជាមួយលេខរង់ចាំ ', toastFix:'បានផ្ញើសំណើកែតម្រូវទៅពលរដ្ឋ។', toastCash:'បានកត់ត្រាការបង់ប្រាក់។ ស្ថានភាពត្រូវបានធ្វើបច្ចុប្បន្នភាព។', toastBio:'បានរក្សាទុកជីវមាត្រ។ ស្ថានភាពត្រូវបានធ្វើបច្ចុប្បន្នភាព។', toastReady:'បានកំណត់ថារួចរាល់។ បានជូនដំណឹងពលរដ្ឋ។', toastReview:'បានផ្លាស់ទៅ «កំពុងពិនិត្យ»។',
-    navDash:'ផ្ទាំងគ្រប់គ្រង', navQueue:'ពាក្យសុំ', navPay:'ការបង់ប្រាក់',
-    d_birth:'សំបុត្រកំណើត', d_family:'សៀវភៅគ្រួសារ', d_res:'សៀវភៅស្នាក់នៅ', d_id:'អត្តសញ្ញាណប័ណ្ណ', d_oldId:'អត្តសញ្ញាណប័ណ្ណបច្ចុប្បន្ន', d_oldPass:'លិខិតឆ្លងដែនបច្ចុប្បន្ន', view:'មើល',
-    mon:'ច័ន្ទ', tue:'អង្គារ', wed:'ពុធ', thu:'ព្រហស្បតិ៍'
+    r_expired:'ផុតសុពលភាព', r_lost:'បាត់', r_damaged:'ខូច',
+    cp0:'ថ្មី', cp1:'ពិនិត្យ', cp2:'ចេញ QR', cp3:'មិនទាន់បង់', cp4:'បានបង់', cp5:'បោះពុម្ព', cp6:'រួចរាល់',
+    sh0:'ថ្មី', sh1:'កំពុងពិនិត្យ', sh2:'បានចេញ QR', sh3:'មិនទាន់បង់', sh4:'បានបង់', sh5:'កំពុងធ្វើ', sh6:'រួចរាល់',
+    st0:'បានដាក់ស្នើ', st1:'កំពុងពិនិត្យ', st2:'បានទទួលយក – បានចេញ QR', st3:'បានថតជីវមាត្រ – រង់ចាំការបង់ប្រាក់', st4:'បានបង់ប្រាក់', st5:'កំពុងដំណើរការ', st6:'រួចរាល់សម្រាប់ទទួល',
+    appNo:'លេខពាក្យសុំ', service:'សេវាកម្ម', reason:'មូលហេតុ', submittedOn:'ថ្ងៃដាក់ស្នើ', payment:'ការបង់ប្រាក់', queueNo:'លេខរង់ចាំ', stepOf:'ជំហាន', of:'នៃ',
+    paidOnline:'បានបង់តាមអនឡាញ (ស្វ័យប្រវត្តិ)', payAtOffice:'សាច់ប្រាក់នៅបញ្ជរ (មិនទាន់បង់)', paidCash:'បានបង់ជាសាច់ប្រាក់', unpaid:'មិនទាន់បង់',
+    reviewTitle:'ផ្ទៀងផ្ទាត់ព័ត៌មាននីមួយៗជាមួយឯកសារ', verifiedOf:'បានផ្ទៀងផ្ទាត់', verifyAllOk:'ផ្ទៀងផ្ទាត់ចំណុចដែលត្រូវគ្នាទាំងអស់',
+    flagged:'OCR មិនសូវច្បាស់ – សូមពិនិត្យដោយប្រុងប្រយ័ត្ន', from:'ពី', edit:'កែ', save:'រក្សាទុក', cancel:'បោះបង់', verify:'ផ្ទៀងផ្ទាត់', verified:'បានផ្ទៀងផ្ទាត់',
+    editedBy:'កែដោយមន្ត្រី · មុននេះ', editNote:'បើមានព័ត៌មានខុស សូមកែនៅទីនេះ។ ពលរដ្ឋមិនចាំបាច់ដាក់ស្នើម្ដងទៀតទេ។',
+    uploadedDocs:'ឯកសារដែលបានបញ្ចូល', tapToView:'ចុចលើឯកសារ ដើម្បីប្រៀបធៀបជាមួយទម្រង់', fieldsFromDoc:'ព័ត៌មានដែលបានអានពីឯកសារនេះ', close:'បិទ', docDemo:'មើលឯកសារ (សាកល្បង)',
+    autoChecks:'ការត្រួតពិនិត្យស្វ័យប្រវត្តិ', c1:'ឈ្មោះដូចគ្នាក្នុងឯកសារទាំងអស់', c2:'ថ្ងៃខែឆ្នាំកំណើតត្រូវគ្នា', c4:'រកមិនឃើញពាក្យសុំស្ទួន',
+    evidence_lost:'បានភ្ជាប់លិខិតបញ្ជាក់ការបាត់បង់ពីនគរបាល', evidence_damaged:'បានភ្ជាប់រូបថតឯកសារដែលខូច។ សូមប្រមូលប័ណ្ណដែលខូចនៅការិយាល័យ។',
+    acceptQr:'ទទួលយក និងចេញកូដ QR', acceptHint:'សូមផ្ទៀងផ្ទាត់ព័ត៌មានទាំងអស់ ដើម្បីទទួលយក។',
+    applicant:'អ្នកស្នើសុំ', qrPreview:'កូដ QR ដែលពលរដ្ឋនឹងទទួលបាន', qrContains:'មានឈ្មោះពេញ និងលេខពាក្យសុំ', validFor:'មានសុពលភាព ១ សប្ដាហ៍ ដល់ថ្ងៃ',
+    issueNote:'ពលរដ្ឋនឹងទទួលដំណឹង ហើយត្រូវមកការិយាល័យក្នុងរយៈពេល ១ សប្ដាហ៍។ លេខរង់ចាំនឹងត្រូវផ្ដល់ជូននៅពេលអ្នកស្កេនកូដ QR នៅការិយាល័យ។', confirmNotify:'បញ្ជាក់ និងជូនដំណឹងពលរដ្ឋ',
+    qrIssued:'បានចេញកូដ QR', waitVisit:'កំពុងរង់ចាំពលរដ្ឋមកការិយាល័យ។', daysLeft:'ថ្ងៃទៀត', validUntil:'មានសុពលភាពដល់',
+    qrExpired:'កូដ QR បានផុតសុពលភាពនៅថ្ងៃ', reissue:'ចេញកូដ QR ថ្មី (មានសុពលភាព ១ សប្ដាហ៍)', scanBtn:'ស្កេនកូដ QR របស់ពលរដ្ឋ',
+    onsite:'ការថតជីវមាត្រនៅការិយាល័យ', checkedInQ:'បានចុះឈ្មោះ · លេខរង់ចាំ', bio1:'បានស្កេនស្នាមម្រាមដៃ', bio2:'បានថតរូប', bio3:'បានវាស់កម្ពស់', bio4:'បានកត់ត្រាសញ្ញាសម្គាល់ពិសេស', updateBio:'ធ្វើបច្ចុប្បន្នភាពជីវមាត្រ',
+    payTitle:'ការបង់ប្រាក់', waitOnline:'កំពុងរង់ចាំការបង់ប្រាក់។ ការបង់តាមអនឡាញ (KHQR / កាត) ធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ។', cashChosen:'ពលរដ្ឋនឹងបង់ជាសាច់ប្រាក់នៅបញ្ជរ។', markCash:'កត់ត្រាថាបានទទួលសាច់ប្រាក់',
+    paidNote:'បានបញ្ជាក់ការបង់ប្រាក់', toProgress:'ផ្លាស់ទៅ «កំពុងដំណើរការ»', progressNote:'ឯកសារកំពុងបោះពុម្ព។', markDone:'រួចរាល់ – អាចមកទទួលបាន',
+    allDone:'បានបញ្ចប់។ ពលរដ្ឋត្រូវបានជូនដំណឹងឱ្យមកទទួលមុនថ្ងៃ', details:'ព័ត៌មានលម្អិត',
+    f_nameKm:'ឈ្មោះ (អក្សរខ្មែរ)', f_nameEn:'ឈ្មោះ (អក្សរឡាតាំង)', f_dob:'ថ្ងៃខែឆ្នាំកំណើត', f_sex:'ភេទ', f_pob:'ទីកន្លែងកំណើត', f_addr:'អាសយដ្ឋានបច្ចុប្បន្ន', f_father:'ឈ្មោះឪពុក', f_mother:'ឈ្មោះម្ដាយ',
+    scanTitle:'ស្កេនកូដ QR របស់ពលរដ្ឋ', scanSub:'តម្រង់កាមេរ៉ាទៅកូដ QR នៅលើទូរស័ព្ទរបស់ពលរដ្ឋ។', scanning:'កំពុងអានកូដ QR…',
+    demoPick:'សាកល្បង៖ ជ្រើសរើសកូដ QR នៅមុខកាមេរ៉ា', noWaiting:'មិនមានពលរដ្ឋកំពុងរង់ចាំជាមួយកូដ QR ទេ។', manual:'ឬបញ្ចូលលេខពាក្យសុំ', find:'ស្វែងរក',
+    resValid:'កូដ QR មានសុពលភាព', resExpired:'កូដ QR ផុតសុពលភាព', resExpiredSub:'កូដ QR មានសុពលភាពតែ ១ សប្ដាហ៍ប៉ុណ្ណោះ។ កូដនេះបានផុតនៅថ្ងៃ', resNotFound:'រកមិនឃើញពាក្យសុំសម្រាប់កូដនេះទេ។',
+    resWrongStage:'ពាក្យសុំនេះមិនមែនកំពុងរង់ចាំការមកការិយាល័យទេ។', resChecked:'បានចុះឈ្មោះរួចហើយ', checkIn:'ចុះឈ្មោះ និងផ្ដល់លេខរង់ចាំ', openApp:'បើកពាក្យសុំ', scanAgain:'ស្កេនម្ដងទៀត',
+    k_paidOnline:'បានបង់តាមអនឡាញ', k_paidCash:'បានបង់ជាសាច់ប្រាក់', payAuto:'ការបង់តាមអនឡាញធ្វើបច្ចុប្បន្នភាពដោយស្វ័យប្រវត្តិ។ សូមកត់ត្រាការបង់ជាសាច់ប្រាក់ នៅពេលពលរដ្ឋបង់នៅបញ្ជរ។',
+    toastReview:'បានផ្លាស់ទៅ «កំពុងពិនិត្យ»។', toastAccept:'បានទទួលយក។ បានផ្ញើកូដ QR ទៅពលរដ្ឋ។', toastReissue:'បានផ្ញើកូដ QR ថ្មី (មានសុពលភាព ១ សប្ដាហ៍)។', toastCheckIn:'បានចុះឈ្មោះ។ លេខរង់ចាំ ',
+    toastBio:'បានធ្វើបច្ចុប្បន្នភាពជីវមាត្រ។ កំពុងរង់ចាំការបង់ប្រាក់។', toastCash:'បានកត់ត្រាការបង់ជាសាច់ប្រាក់។', toastProgress:'បានផ្លាស់ទៅ «កំពុងដំណើរការ»។', toastDone:'រួចរាល់។ បានជូនដំណឹងពលរដ្ឋឱ្យមកទទួលក្នុង ១ សប្ដាហ៍។',
+    toastSaved:'បានកែ និងផ្ទៀងផ្ទាត់ព័ត៌មាន។', toastWelcome:'សូមស្វាគមន៍ ',
+    navDash:'ផ្ទាំងគ្រប់គ្រង', navQueue:'ពាក្យសុំ', navScan:'ស្កេន', navPay:'ការបង់ប្រាក់',
+    d_birth:'សំបុត្រកំណើត', d_family:'សៀវភៅគ្រួសារ', d_familyOrRes:'សៀវភៅគ្រួសារ / ស្នាក់នៅ', d_id:'អត្តសញ្ញាណប័ណ្ណ', d_oldId:'អត្តសញ្ញាណប័ណ្ណបច្ចុប្បន្ន', d_oldPass:'លិខិតឆ្លងដែនបច្ចុប្បន្ន',
+    d_policeLoss:'លិខិតបញ្ជាក់ការបាត់បង់ពីនគរបាល', d_damagedId:'អត្តសញ្ញាណប័ណ្ណខូច (រូបថត)', d_damagedPass:'លិខិតឆ្លងដែនខូច (រូបថត)', d_oldPassCopy:'ច្បាប់ចម្លងលិខិតឆ្លងដែនចាស់', view:'មើល'
   }
 };
-var DOCS = { newId:['d_birth','d_family','d_res'], renewId:['d_oldId','d_family'], newPass:['d_id','d_birth','d_family'], renewPass:['d_oldPass','d_id'] };
 var KMD = '០១២៣៤៥៦៧៨៩';
-var SEED = [
-  { id:'o1', no:'KH-2611-0142', km:'សុខ ដារា', en:'Sok Dara', svc:'renewPass', date:'20/11/2026', dob:'12/04/2001', stage:1, pay:null, queue:'', apptDate:'' },
-  { id:'o2', no:'KH-2611-0139', km:'ចាន់ ស្រីមុំ', en:'Chan Sreymom', svc:'newId', date:'19/11/2026', dob:'03/09/2008', stage:0, pay:null, queue:'', apptDate:'' },
-  { id:'o3', no:'KH-2611-0135', km:'ពៅ សុវណ្ណ', en:'Pov Sovann', svc:'newPass', date:'18/11/2026', dob:'21/01/1995', stage:0, pay:null, queue:'', apptDate:'' },
-  { id:'o4', no:'KH-2611-0131', km:'កែវ វិសាល', en:'Keo Visal', svc:'renewId', date:'14/11/2026', dob:'30/06/1990', stage:2, pay:'cash', queue:'A-027', apptDate:'27/11/2026' },
-  { id:'o5', no:'KH-2611-0127', km:'លឹម សុភ័ក្ត្រ', en:'Lim Sopheak', svc:'newPass', date:'12/11/2026', dob:'15/02/1999', stage:3, pay:'online', queue:'A-021', apptDate:'24/11/2026' },
-  { id:'o6', no:'KH-2611-0120', km:'ហេង រតនា', en:'Heng Rathana', svc:'renewPass', date:'07/11/2026', dob:'08/11/1987', stage:5, pay:'online', queue:'A-012', apptDate:'14/11/2026' },
-  { id:'o7', no:'KH-2611-0118', km:'ម៉ៅ សុភ័ក្រ', en:'Mao Sopheak', svc:'renewId', date:'06/11/2026', dob:'09/05/1992', stage:1, pay:null, queue:'', apptDate:'', reason:'lost' },
-  { id:'o8', no:'KH-2611-0115', km:'វ៉ាន់ រស្មី', en:'Van Rasmey', svc:'renewId', date:'05/11/2026', dob:'18/08/1996', stage:0, pay:null, queue:'', apptDate:'', reason:'damaged' }
-];
-var DATES = [['mon','24/11'],['tue','25/11'],['wed','26/11'],['thu','27/11']];
-var TIMES = ['08:00 – 08:30','08:30 – 09:00','14:00 – 14:30','14:30 – 15:00'];
-var FILTERS = { all:null, pending:[0,1], verified:[2], onsite:[3,4], ready:[5] };
+var FIELD_LABEL = { nameKm:'f_nameKm', nameEn:'f_nameEn', dob:'f_dob', sex:'f_sex', pob:'f_pob', addr:'f_addr', father:'f_father', mother:'f_mother' };
+var FILTERS = { all:null, pending:[0,1], accepted:[2], onsite:[3,4], progress:[5], ready:[6] };
+var SVCS = ['newId', 'renewId', 'newPass', 'renewPass'];
+var SVC_COLORS = ['#2a78d6', '#eb6834', '#1baf7a', '#eda100']; /* validated categorical slots 1–4 */
+var ID_DOCS = ['d_oldId', 'd_oldPass', 'd_id', 'd_birth', 'd_damagedId', 'd_damagedPass'];
+
+function srcFor(key, docs) {
+  var pick = function (list) { for (var i = 0; i < list.length; i++) { if (docs.indexOf(list[i]) >= 0) return list[i]; } return docs[0]; };
+  if (key === 'addr') return pick(['d_familyOrRes', 'd_family']);
+  if (key === 'father' || key === 'mother') return pick(['d_family', 'd_familyOrRes', 'd_birth']);
+  return pick(ID_DOCS);
+}
+function titleCase(s) { return String(s || '').toLowerCase().replace(/(^|\s)\S/g, function (c) { return c.toUpperCase(); }); }
 
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { lang:null, screen:'dash', filter:'all', selId:'o1', apps:SEED, date:3, time:1, bio:{}, toast:'', nextQ:32 };
+    var self = this;
+    this.state = {
+      lang: null, screen: 'login', authMode: 'login', loginId: '', loginPw: '', suName: '', suId: '', suOffice: 0, suPhone: '', suPw: '', authErr: '', officer: null,
+      filter: 'all', search: '', selId: null, apps: S.load(), bio: {}, toast: '', editKey: null, editVal: '', docView: null,
+      scanPhase: 'idle', scanId: null, scanNo: ''
+    };
+    S.subscribe(function (apps) { self.setState({ apps: apps }); });
   }
-  upd(id, patch) { this.setState({ apps: this.state.apps.map(function (a) { return a.id === id ? Object.assign({}, a, patch) : a; }) }); }
+  upd(id, patch) { this.setState({ apps: S.update(id, patch) }); }
   flash(msg) {
     var self = this; this.setState({ toast: msg });
     clearTimeout(this._tt); this._tt = setTimeout(function () { self.setState({ toast: '' }); }, 2600);
   }
-  componentWillUnmount() { clearTimeout(this._tt); }
+  open(a, t) {
+    if (a.stage === 0) { this.upd(a.id, { stage: 1 }); this.flash(t.toastReview); }
+    this.setState({ selId: a.id, screen: 'detail', bio: {}, editKey: null, docView: null });
+  }
   renderVals() {
     var self = this, st = this.state;
     var lang = st.lang || this.props.startLanguage || 'km';
     var t = T[lang];
     var kn = function (s) { s = String(s); return lang === 'km' ? s.replace(/[0-9]/g, function (d) { return KMD[+d]; }) : s; };
-    var pillFor = function (s) { return s <= 1 ? 'pill blue' : (s === 2 ? 'pill amber' : (s === 5 ? 'pill green' : 'pill violet')); };
+    var D = function (ms) { return kn(S.fmt(ms)); };
+    var pillFor = function (s) { return s <= 1 ? 'pill blue' : (s === 2 || s === 3 ? 'pill amber' : (s === 6 ? 'pill green' : 'pill violet')); };
     var payLabel = function (a) { return a.pay === 'online' ? t.paidOnline : (a.pay === 'cashPaid' ? t.paidCash : (a.pay === 'cash' ? t.payAtOffice : t.unpaid)); };
+    var apps = st.apps;
     var view = function (a) {
-      var name = lang === 'km' ? a.km : a.en;
+      var name = lang === 'km' ? a.form.nameKm : titleCase(a.form.nameEn);
       return {
-        name: name, nameAlt: lang === 'km' ? a.en.toUpperCase() : a.km, initials: a.en.split(' ').map(function (w) { return w[0]; }).join(''),
-        no: a.no, svcName: t['svc_' + a.svc], date: kn(a.date), dob: kn(a.dob), short: t['sh' + a.stage], status: t['st' + a.stage], pillCls: pillFor(a.stage),
+        id: a.id, name: name, nameAlt: lang === 'km' ? a.form.nameEn : a.form.nameKm,
+        initials: titleCase(a.form.nameEn).split(' ').map(function (w) { return w[0]; }).join('').slice(0, 2),
+        no: a.no, svcName: t['svc_' + a.svc], date: D(a.createdAt), short: t['sh' + a.stage], status: t['st' + a.stage], pillCls: pillFor(a.stage),
+        hasReason: a.reason === 'lost' || a.reason === 'damaged', reasonLabel: a.reason ? t['r_' + a.reason] : '', reasonCls: 'tag ' + (a.reason || ''),
         payLabel: payLabel(a), payCls: (a.pay === 'online' || a.pay === 'cashPaid') ? 'pill green' : 'pill amber',
-        hasQueue: !!a.queue, queue: a.queue, apptDate: kn(a.apptDate),
-        open: function () { self.setState({ selId: a.id, screen: 'detail', bio: {} }); }
+        hasQueue: !!a.queue, queue: a.queue,
+        open: function () { self.open(a, t); }
       };
     };
-    var apps = st.apps;
     var count = function (fn) { return apps.filter(fn).length; };
-    var k = {
-      pending: kn(count(function (a) { return a.stage <= 1; })),
-      newly: kn(count(function (a) { return a.svc === 'newId' || a.svc === 'newPass'; })),
-      renew: kn(count(function (a) { return a.svc === 'renewId' || a.svc === 'renewPass'; })),
-      unpaid: kn(count(function (a) { return a.stage === 2; })),
-      paid: kn(count(function (a) { return a.pay === 'online' || a.pay === 'cashPaid'; })),
-      lost: kn(count(function (a) { return a.svc === 'renewId' && a.reason === 'lost'; })),
-      damaged: kn(count(function (a) { return a.svc === 'renewId' && a.reason === 'damaged'; }))
-    };
-    var max = apps.length || 1;
-    var bySvc = ['newId', 'renewId', 'newPass', 'renewPass'].map(function (s) {
+
+    /* ---------- Dashboard ---------- */
+    var lostId = count(function (a) { return a.reason === 'lost' && a.svc === 'renewId'; }), lostPass = count(function (a) { return a.reason === 'lost' && a.svc === 'renewPass'; });
+    var dmgId = count(function (a) { return a.reason === 'damaged' && a.svc === 'renewId'; }), dmgPass = count(function (a) { return a.reason === 'damaged' && a.svc === 'renewPass'; });
+    var kpis = [
+      { label: t.k_pending, value: kn(count(function (a) { return a.stage <= 1; })), cls: 'kpi hl', sub: '', hasSub: false },
+      { label: t.k_new, value: kn(count(function (a) { return a.svc.indexOf('new') === 0; })), cls: 'kpi', sub: '', hasSub: false },
+      { label: t.k_renew, value: kn(count(function (a) { return a.svc.indexOf('renew') === 0; })), cls: 'kpi', sub: '', hasSub: false },
+      { label: t.k_unpaid, value: kn(count(function (a) { return a.stage === 3; })), cls: 'kpi', sub: '', hasSub: false },
+      { label: t.k_lost, value: kn(lostId + lostPass), cls: 'kpi warn', sub: t.kId + ' ' + kn(lostId) + ' · ' + t.kPass + ' ' + kn(lostPass), hasSub: true },
+      { label: t.k_damaged, value: kn(dmgId + dmgPass), cls: 'kpi warn', sub: t.kId + ' ' + kn(dmgId) + ' · ' + t.kPass + ' ' + kn(dmgPass), hasSub: true }
+    ];
+    var stageCounts = [0, 1, 2, 3, 4, 5, 6].map(function (s) { return count(function (a) { return a.stage === s; }); });
+    var stageMax = Math.max.apply(null, stageCounts.concat([1]));
+    var pipeline = stageCounts.map(function (n, s) {
+      return { label: t['cp' + s], count: kn(n), h: 'height:' + Math.round(n / stageMax * 100) + '%', zero: n === 0, tip: t['st' + s] + ': ' + kn(n),
+        open: function () { var f = s <= 1 ? 'pending' : (s === 2 ? 'accepted' : (s <= 4 ? 'onsite' : (s === 5 ? 'progress' : 'ready'))); self.setState({ screen: 'queue', filter: f }); } };
+    });
+    var total = apps.length || 1;
+    var svcMix = SVCS.map(function (s, i) {
       var n = count(function (a) { return a.svc === s; });
-      return { name: t['svc_' + s], count: kn(n), pct: Math.round(n / max * 100) + '%', color: s.indexOf('Pass') > 0 ? '#B91C1C' : '#1D3F8F' };
+      return { name: t['svc_' + s], count: kn(n), pct: Math.round(n / total * 100), seg: 'flex-grow:' + n + ';background:' + SVC_COLORS[i], dot: 'background:' + SVC_COLORS[i], show: n > 0, tip: t['svc_' + s] + ': ' + kn(n) };
     });
-    var byStage = [0, 1, 2, 3, 4, 5].map(function (s) {
-      var n = count(function (a) { return a.stage === s; });
-      return { name: t['st' + s], count: kn(n), pct: Math.round(n / max * 100) + '%' };
+    svcMix.forEach(function (m) { m.pctLabel = kn(m.pct) + '%'; });
+    var startToday = new Date(); startToday.setHours(0, 0, 0, 0); startToday = startToday.getTime();
+    var weekCounts = [6, 5, 4, 3, 2, 1, 0].map(function (d) {
+      var from = startToday - d * S.DAY, to = from + S.DAY;
+      return { d: d, from: from, n: count(function (a) { return a.createdAt >= from && a.createdAt < to; }) };
     });
-    var filters = ['all', 'pending', 'verified', 'onsite', 'ready'].map(function (f) {
+    var weekMax = Math.max.apply(null, weekCounts.map(function (w) { return w.n; }).concat([1]));
+    var week = weekCounts.map(function (w) {
+      var label = w.d === 0 ? t.today : kn(S.fmtShort(w.from));
+      return { label: label, count: kn(w.n), h: 'height:' + Math.round(w.n / weekMax * 100) + '%', zero: w.n === 0, tip: label + ': ' + kn(w.n), cls: w.d === 0 ? 'col today' : 'col' };
+    });
+    var weekTotal = kn(weekCounts.reduce(function (sum, w) { return sum + w.n; }, 0));
+
+    /* ---------- Queue ---------- */
+    var filters = ['all', 'pending', 'accepted', 'onsite', 'progress', 'ready'].map(function (f) {
       return { label: t['f_' + f], on: st.filter === f, cls: st.filter === f ? 'on' : '', pick: function () { self.setState({ filter: f }); } };
     });
-    var fs = FILTERS[st.filter];
-    var list = apps.filter(function (a) { return !fs || fs.indexOf(a.stage) >= 0; }).map(view);
-    var payList = apps.filter(function (a) { return a.stage >= 2; }).map(view);
+    var fs = FILTERS[st.filter], q = st.search.trim().toLowerCase();
+    var list = apps.filter(function (a) {
+      if (fs && fs.indexOf(a.stage) < 0) return false;
+      if (!q) return true;
+      return (a.no + ' ' + a.form.nameEn + ' ' + a.form.nameKm).toLowerCase().indexOf(q) >= 0;
+    }).sort(function (x, y) { return x.stage - y.stage || y.createdAt - x.createdAt; }).map(view);
+
+    /* ---------- Selected application ---------- */
     var a = apps.filter(function (x) { return x.id === st.selId; })[0] || apps[0];
     var sel = view(a);
-    sel.docs = (DOCS[a.svc] || []).map(function (d) { return { name: t[d], aria: t.view + ' – ' + t[d] }; });
-    sel.checks = [
-      { title: t.c1, sub: t.c1s, ok: true, bad: false, icCls: 'ic ok' },
-      { title: t.c2, sub: t.c2s, ok: true, bad: false, icCls: 'ic ok' },
-      { title: t.c3, sub: t.c3s, ok: false, bad: true, icCls: 'ic warn' },
-      { title: t.c4, sub: t.c4s, ok: true, bad: false, icCls: 'ic ok' }
-    ];
-    if (a.stage >= 2) { sel.checks[2] = { title: t.c3ok, sub: t.c3oks, ok: true, bad: false, icCls: 'ic ok' }; }
-    sel.atSubmitted = a.stage === 0; sel.atReview = a.stage === 1;
-    sel.atVerified = a.stage === 2 && a.pay !== 'online'; sel.atPaid = a.stage === 3 || (a.stage === 2 && a.pay === 'online');
-    sel.atBio = a.stage === 4; sel.atReady = a.stage === 5;
+    var docKeys = S.docsFor(a.svc, a.reason);
+    var verified = a.verified || {}, edited = a.edited || {};
+    var keys = S.FIELD_KEYS.slice().sort(function (x, y) { return (x === a.warn ? -1 : 0) - (y === a.warn ? -1 : 0); });
+    var fields = keys.map(function (k) {
+      var isV = !!verified[k], flagged = k === a.warn && !isV, editing = st.editKey === k;
+      return {
+        key: k, label: t[FIELD_LABEL[k]], value: a.form[k], src: t[srcFor(k, docKeys)], flagged: flagged, isVerified: isV, notVerified: !isV,
+        edited: edited.hasOwnProperty(k), was: edited[k], editing: editing, notEditing: !editing,
+        rowCls: 'frow' + (flagged ? ' flag' : '') + (isV ? ' ok' : '') + (editing ? ' editing' : ''),
+        verifyCls: isV ? 'vbtn on' : 'vbtn', verifyLabel: isV ? t.verified : t.verify,
+        toggle: function () { var v = Object.assign({}, verified); v[k] = !v[k]; self.upd(a.id, { verified: v }); },
+        edit: function () { self.setState({ editKey: k, editVal: a.form[k] }); },
+        onEdit: function (e) { self.setState({ editVal: e.target.value }); },
+        cancel: function () { self.setState({ editKey: null }); },
+        save: function () {
+          var val = self.state.editVal.trim();
+          var form = Object.assign({}, a.form), ed = Object.assign({}, edited), v = Object.assign({}, verified);
+          if (val && val !== a.form[k]) { if (!ed.hasOwnProperty(k)) ed[k] = a.form[k]; form[k] = val; }
+          v[k] = true;
+          self.upd(a.id, { form: form, edited: ed, verified: v });
+          self.setState({ editKey: null });
+          self.flash(t.toastSaved);
+        }
+      };
+    });
+    var vCount = fields.filter(function (f) { return f.isVerified; }).length;
+    sel.fields = fields;
+    sel.vProgress = kn(vCount) + ' / ' + kn(fields.length) + ' ' + t.verifiedOf;
+    sel.vBar = 'width:' + Math.round(vCount / fields.length * 100) + '%';
+    sel.allVerified = vCount === fields.length; sel.notAllVerified = !sel.allVerified;
+    sel.docs = docKeys.map(function (d) { return { name: t[d], aria: t.view + ' – ' + t[d], open: function () { self.setState({ docView: d }); } }; });
+    sel.reasonEvidence = a.reason === 'lost' ? t.evidence_lost : (a.reason === 'damaged' ? t.evidence_damaged : '');
+    sel.hasEvidence = !!sel.reasonEvidence;
+    sel.checks = [t.c1, t.c2, t.c4];
+    sel.stepText = t.stepOf + ' ' + kn(a.stage + 1) + ' ' + t.of + ' ' + kn(7) + ' · ' + t['st' + a.stage];
+    sel.stepDots = [0, 1, 2, 3, 4, 5, 6].map(function (i) { return { cls: i < a.stage ? 'sd done' : (i === a.stage ? 'sd cur' : 'sd') }; });
+    sel.details = S.FIELD_KEYS.map(function (k) { return { label: t[FIELD_LABEL[k]], value: a.form[k], edited: edited.hasOwnProperty(k) }; });
+    sel.payLabel = payLabel(a);
+    var qrUntil = S.qrUntil(a), qrOk = S.qrValid(a);
+    sel.atReview = a.stage <= 1;
+    sel.atQr = a.stage === 2 && !a.queue; sel.qrOk = qrOk; sel.qrBad = !qrOk;
+    sel.qrIssuedOn = D(a.qrAt); sel.qrUntil = D(qrUntil); sel.qrDaysLeft = kn(S.daysLeft(qrUntil)) + ' ' + t.daysLeft;
+    sel.atBio = a.stage === 2 && !!a.queue;
+    sel.atPay = a.stage === 3; sel.cashChosen = a.pay === 'cash'; sel.onlineWait = a.pay !== 'cash';
+    sel.atPaid = a.stage === 4; sel.atProgress = a.stage === 5; sel.atReady = a.stage === 6;
+    sel.pickBy = D(S.pickupUntil(a));
+    sel.showDetails = a.stage >= 2;
+    var docView = st.docView ? {
+      name: t[st.docView],
+      fields: fields.filter(function (f) { return srcFor(f.key, docKeys) === st.docView; }).map(function (f) { return { label: f.label, value: f.value }; })
+    } : null;
     var bioItems = [1, 2, 3, 4].map(function (i) {
       return { label: t['bio' + i], on: !!st.bio[i], toggle: function () { var b = Object.assign({}, self.state.bio); b[i] = !b[i]; self.setState({ bio: b }); } };
     });
-    var bioIncomplete = bioItems.some(function (b) { return !b.on; });
-    var dates = DATES.map(function (d, i) { return { label: t[d[0]] + ' ' + kn(d[1]), on: st.date === i, cls: st.date === i ? 'on' : '', pick: function () { self.setState({ date: i }); } }; });
-    var times = TIMES.map(function (d, i) { return { label: kn(d), on: st.time === i, cls: st.time === i ? 'on' : '', pick: function () { self.setState({ time: i }); } }; });
-    var q = 'A-0' + st.nextQ;
+
+    /* QR the citizen receives (issue screen preview) */
+    var previewApp = Object.assign({}, a, { qrAt: a.qrAt && a.stage === 2 ? a.qrAt : Date.now() });
+    var issueQr = S.qrImage(S.qrText(previewApp));
+
+    /* ---------- Scan ---------- */
+    var waiting = apps.filter(function (x) { return x.stage === 2 && !x.queue; }).map(function (x) {
+      var v = view(x);
+      v.qr = S.qrImage(S.qrText(x));
+      v.validity = S.qrValid(x) ? t.validUntil + ' ' + D(S.qrUntil(x)) : t.resExpired;
+      v.vCls = S.qrValid(x) ? 'v ok' : 'v bad';
+      v.pick = function () {
+        self.setState({ scanPhase: 'scanning', scanId: x.id });
+        clearTimeout(self._st); self._st = setTimeout(function () { self.setState({ scanPhase: 'result' }); }, 1300);
+      };
+      return v;
+    });
+    var scanned = st.scanId ? apps.filter(function (x) { return x.id === st.scanId; })[0] : null;
+    var res = { kind: 'none' };
+    if (st.scanPhase === 'result') {
+      if (!scanned) res.kind = 'missing';
+      else if (scanned.stage === 2 && scanned.queue) res.kind = 'checked';
+      else if (scanned.stage !== 2) res.kind = scanned.stage > 2 ? 'checked' : 'wrong';
+      else if (!S.qrValid(scanned)) res.kind = 'expired';
+      else res.kind = 'valid';
+    }
+    var scan = {
+      idle: st.scanPhase === 'idle', scanning: st.scanPhase === 'scanning', result: st.scanPhase === 'result',
+      valid: res.kind === 'valid', expired: res.kind === 'expired', missing: res.kind === 'missing', wrong: res.kind === 'wrong', checked: res.kind === 'checked',
+      app: scanned ? view(scanned) : null, until: scanned ? D(S.qrUntil(scanned)) : '', queue: scanned ? scanned.queue : '',
+      waiting: waiting, noWaiting: waiting.length === 0, no: st.scanNo
+    };
+
+    /* ---------- Payments ---------- */
+    var payList = apps.filter(function (x) { return x.stage >= 3; }).sort(function (x, y) { return x.stage - y.stage; }).map(function (x) {
+      var v = view(x);
+      v.canCash = x.stage === 3;
+      v.markCash = function () { self.upd(x.id, { stage: 4, pay: 'cashPaid' }); self.flash(t.toastCash); };
+      return v;
+    });
+
     var s = st.screen;
-    var is = { dash: s === 'dash', queue: s === 'queue', detail: s === 'detail', schedule: s === 'schedule', payments: s === 'payments' };
-    var titles = { dash: t.t_dash, queue: t.t_queue, detail: t.t_detail, schedule: t.t_schedule, payments: t.t_payments };
-    var root = s === 'dash' || s === 'queue' || s === 'payments';
-    var navOn = function (k2) { return (s === k2 || (k2 === 'queue' && (s === 'detail' || s === 'schedule'))) ? 'on' : ''; };
+    var is = {}; ['login', 'dash', 'queue', 'detail', 'issue', 'scan', 'payments'].forEach(function (k) { is[k] = s === k; });
+    var titles = { login: '', dash: t.t_dash, queue: t.t_queue, detail: t.t_detail, issue: t.t_issue, scan: t.t_scan, payments: t.t_payments };
+    var root = s === 'dash' || s === 'queue' || s === 'payments' || s === 'scan';
+    var navOn = function (k2) { return (s === k2 || (k2 === 'queue' && (s === 'detail' || s === 'issue'))) ? 'on' : ''; };
+    var officer = st.officer;
+    var isSignup = st.authMode === 'signup';
+
     return {
-      t: t, is: is, title: titles[s], showBack: !root, showLogo: root,
+      t: t, is: is, title: titles[s], brand: S.BRAND, topCls: s === 'login' ? 'top bare' : 'top',
+      officerSub: officer ? officer.name + ' · ' + t['off' + officer.office] : '', hasOfficer: !!officer && s !== 'login',
+      showBack: s === 'detail' || s === 'issue', showLogo: root, showNav: s !== 'login',
       kmCls: lang === 'km' ? 'on' : '', enCls: lang === 'en' ? 'on' : '', isKm: lang === 'km', isEn: lang === 'en',
       setKm: function () { self.setState({ lang: 'km' }); }, setEn: function () { self.setState({ lang: 'en' }); },
-      goBack: function () { self.setState({ screen: s === 'schedule' ? 'detail' : 'queue' }); },
+      goBack: function () { self.setState({ screen: s === 'issue' ? 'detail' : 'queue', docView: null, editKey: null }); },
       goDash: function () { self.setState({ screen: 'dash' }); }, goQueue: function () { self.setState({ screen: 'queue' }); },
       goPayments: function () { self.setState({ screen: 'payments' }); },
+      goScan: function () { self.setState({ screen: 'scan', scanPhase: 'idle', scanId: null, scanNo: '' }); },
       goQueuePending: function () { self.setState({ screen: 'queue', filter: 'pending' }); },
-      nav: { dash: navOn('dash'), queue: navOn('queue'), payments: navOn('payments') },
-      k: k, bySvc: bySvc, byStage: byStage, filters: filters, list: list, listEmpty: list.length === 0, payList: payList,
-      sel: sel, bioItems: bioItems, bioIncomplete: bioIncomplete, dates: dates, times: times, nextQueue: q,
-      startReview: function () { self.upd(a.id, { stage: 1 }); self.flash(t.toastReview); },
-      goSchedule: function () { self.setState({ screen: 'schedule' }); },
-      requestFix: function () { self.flash(t.toastFix); },
-      confirmAccept: function () {
-        self.upd(a.id, { stage: 2, pay: a.pay || 'cash', queue: q, apptDate: DATES[st.date][1] + '/2026' });
-        self.setState({ screen: 'detail', nextQ: st.nextQ + 1 });
-        self.flash(t.toastAccept + q);
+      nav: { dash: navOn('dash'), queue: navOn('queue'), scan: navOn('scan'), payments: navOn('payments') },
+
+      /* auth */
+      isSignup: isSignup, isLogin: !isSignup, tabLoginCls: isSignup ? '' : 'on', tabSignupCls: isSignup ? 'on' : '',
+      authTitle: isSignup ? t.signupTitle : t.loginTitle, authSub: isSignup ? t.signupSub : t.loginSub,
+      switchHint: isSignup ? t.haveAccount : t.noAccount, switchCta: isSignup ? t.logIn : t.signUp,
+      tabLogin: function () { self.setState({ authMode: 'login', authErr: '' }); }, tabSignup: function () { self.setState({ authMode: 'signup', authErr: '' }); },
+      switchMode: function () { self.setState({ authMode: isSignup ? 'login' : 'signup', authErr: '' }); },
+      loginId: st.loginId, loginPw: st.loginPw, suName: st.suName, suId: st.suId, suPhone: st.suPhone, suPw: st.suPw,
+      authErr: st.authErr, hasAuthErr: !!st.authErr,
+      offices: [0, 1].map(function (i) { return { label: t['off' + i], cls: st.suOffice === i ? 'on' : '', on: st.suOffice === i, pick: function () { self.setState({ suOffice: i }); } }; }),
+      onLoginId: function (e) { self.setState({ loginId: e.target.value, authErr: '' }); }, onLoginPw: function (e) { self.setState({ loginPw: e.target.value, authErr: '' }); },
+      onSuName: function (e) { self.setState({ suName: e.target.value }); }, onSuId: function (e) { self.setState({ suId: e.target.value }); },
+      onSuPhone: function (e) { self.setState({ suPhone: e.target.value }); }, onSuPw: function (e) { self.setState({ suPw: e.target.value }); },
+      doLogin: function () {
+        var s2 = self.state, id = s2.loginId.trim().toUpperCase();
+        var acc = S.accounts().filter(function (x) { return x.id.toUpperCase() === id && x.pw === s2.loginPw; })[0];
+        if (!acc) { self.setState({ authErr: t.loginErr }); return; }
+        self.setState({ officer: acc, screen: 'dash', loginPw: '', authErr: '' });
+        self.flash(t.toastWelcome + acc.name);
       },
-      markCash: function () { self.upd(a.id, { stage: 3, pay: 'cashPaid' }); self.flash(t.toastCash); },
-      markBio: function () { self.upd(a.id, { stage: 4 }); self.setState({ bio: {} }); self.flash(t.toastBio); },
-      markReady: function () { self.upd(a.id, { stage: 5 }); self.flash(t.toastReady); },
+      doSignup: function () {
+        var s2 = self.state, id = s2.suId.trim().toUpperCase();
+        if (!s2.suName.trim() || !id || !s2.suPhone.trim() || !s2.suPw) { self.setState({ authErr: t.needFields }); return; }
+        if (S.accounts().some(function (x) { return x.id.toUpperCase() === id; })) { self.setState({ authErr: t.idTaken }); return; }
+        var acc = { id: id, pw: s2.suPw, name: s2.suName.trim(), office: s2.suOffice, phone: s2.suPhone.trim() };
+        S.addAccount(acc);
+        self.setState({ officer: acc, screen: 'dash', suPw: '', authErr: '' });
+        self.flash(t.toastWelcome + acc.name);
+      },
+      logOut: function () { self.setState({ officer: null, screen: 'login', authMode: 'login', loginPw: '', authErr: '' }); },
+
+      /* dashboard */
+      kpis: kpis, pipeline: pipeline, svcMix: svcMix, week: week, weekTotal: weekTotal, totalApps: kn(apps.length),
+
+      /* queue */
+      filters: filters, list: list, listEmpty: list.length === 0, search: st.search,
+      onSearch: function (e) { self.setState({ search: e.target.value }); },
+
+      /* detail */
+      sel: sel, docView: docView, hasDocView: !!docView, closeDoc: function () { self.setState({ docView: null }); },
+      editVal: st.editVal, bioItems: bioItems, bioIncomplete: bioItems.some(function (b) { return !b.on; }),
+      verifyAll: function () { var v = Object.assign({}, verified); S.FIELD_KEYS.forEach(function (k) { if (k !== a.warn) v[k] = true; }); self.upd(a.id, { verified: v }); },
+      goIssue: function () { self.setState({ screen: 'issue', editKey: null }); },
+      issueQr: issueQr, issueUntil: D(previewApp.qrAt + S.QR_DAYS * S.DAY),
+      confirmIssue: function () { self.upd(a.id, { stage: 2, qrAt: Date.now(), queue: '' }); self.setState({ screen: 'detail' }); self.flash(t.toastAccept); },
+      reissue: function () { var id = scanned && st.screen === 'scan' ? scanned.id : a.id; self.upd(id, { qrAt: Date.now() }); self.flash(t.toastReissue); },
+      scanFromDetail: function () { self.setState({ screen: 'scan', scanPhase: 'idle', scanId: null, scanNo: '' }); },
+      markBio: function () { self.upd(a.id, { stage: 3 }); self.setState({ bio: {} }); self.flash(t.toastBio); },
+      markCash: function () { self.upd(a.id, { stage: 4, pay: 'cashPaid' }); self.flash(t.toastCash); },
+      toProgress: function () { self.upd(a.id, { stage: 5 }); self.flash(t.toastProgress); },
+      markDone: function () { self.upd(a.id, { stage: 6, readyAt: Date.now() }); self.flash(t.toastDone); },
+
+      /* scan */
+      scan: scan,
+      onScanNo: function (e) { self.setState({ scanNo: e.target.value }); },
+      findNo: function () {
+        var n = self.state.scanNo.trim().toUpperCase(); if (!n) return;
+        var hit = apps.filter(function (x) { return x.no.toUpperCase() === n || x.no.toUpperCase().slice(-n.length) === n; })[0];
+        self.setState({ scanPhase: 'result', scanId: hit ? hit.id : null });
+      },
+      checkIn: function () {
+        if (!scanned) return;
+        var qn = S.nextQueue(S.load());
+        self.upd(scanned.id, { queue: qn });
+        self.setState({ selId: scanned.id, screen: 'detail', bio: {}, scanPhase: 'idle', scanId: null, scanNo: '' });
+        self.flash(t.toastCheckIn + qn);
+      },
+      openScanned: function () { if (scanned) self.open(scanned, t); },
+      scanAgain: function () { self.setState({ scanPhase: 'idle', scanId: null, scanNo: '' }); },
+
+      /* payments */
+      payList: payList,
+      kUnpaid: kn(count(function (x) { return x.stage === 3; })),
+      kPaidOnline: kn(count(function (x) { return x.pay === 'online'; })),
+      kPaidCash: kn(count(function (x) { return x.pay === 'cashPaid'; })),
       toast: st.toast
     };
   }
